@@ -6,9 +6,9 @@
         {
             "name": "frontend-container",
             "image": "364680233920.dkr.ecr.ap-southeast-1.amazonaws.com/kbb-frontend:latest",
-            "cpu": 512,
-            "memory": 500,
-            "memoryReservation": 500,
+            "cpu": 256,
+            "memory": 512,
+            "memoryReservation": 126,
             "portMappings": [
                 {
                     "containerPort": 8080,
@@ -64,5 +64,7 @@
     ],
     "requiresCompatibilities": [
         "EC2"
-    ]
+    ],
+    "cpu": "256",
+    "memory": "512"
 }

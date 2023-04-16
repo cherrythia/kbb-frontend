@@ -1,14 +1,14 @@
 {
-    "family": "kbb-backend-task",
+    "family": "kbb-frontend-task",
     "taskRoleArn": "arn:aws:iam::364680233920:role/ecsTaskExecutionRole",
     "executionRoleArn": "arn:aws:iam::364680233920:role/ecsTaskExecutionRole",
     "containerDefinitions": [
         {
             "name": "frontend-container",
             "image": "364680233920.dkr.ecr.ap-southeast-1.amazonaws.com/kbb-frontend:latest",
-            "cpu": 0,
-            "memory": 1000,
-            "memoryReservation": 500,
+            "cpu": 256,
+            "memory": 512,
+            "memoryReservation": 126,
             "portMappings": [
                 {
                     "containerPort": 8080,
@@ -64,5 +64,7 @@
     ],
     "requiresCompatibilities": [
         "EC2"
-    ]
+    ],
+    "cpu": "256",
+    "memory": "512"
 }

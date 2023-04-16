@@ -1,5 +1,5 @@
 {
-    "family": "kbb-backend-task",
+    "family": "kbb-frontend-task",
     "taskRoleArn": "arn:aws:iam::364680233920:role/ecsTaskExecutionRole",
     "executionRoleArn": "arn:aws:iam::364680233920:role/ecsTaskExecutionRole",
     "containerDefinitions": [

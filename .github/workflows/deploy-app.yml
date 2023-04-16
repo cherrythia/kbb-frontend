@@ -32,7 +32,7 @@ on:
 
 env:
   AWS_REGION: ap-southeast-1                  # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: kbb-backend                 # set this to your Amazon ECR repository name
+  ECR_REPOSITORY: kbb-frontend                # set this to your Amazon ECR repository name
   ECS_SERVICE: kbb-backend-service                # set this to your Amazon ECS service name
   ECS_CLUSTER: nus-kbb-cluster                    # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: aws/aws-frontend-task.json # set this to the path to your Amazon ECS task definition
@@ -73,7 +73,7 @@ jobs:
         # Build a docker container and
         # push it to ECR so that it can
         # be deployed to ECS.
-        docker build -f Dockerfile.backend -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker build -f Dockerfile.frontend -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 

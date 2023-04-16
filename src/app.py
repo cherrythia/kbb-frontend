@@ -7,4 +7,4 @@ def index():
     return send_from_directory('Views', 'index.html')
 
 if __name__ == '__main__':
-    app.run(host="localhost",port=8000)
+    app.run(host="localhost",port=8080)

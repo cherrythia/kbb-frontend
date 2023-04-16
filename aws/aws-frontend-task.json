@@ -4,8 +4,8 @@
     "executionRoleArn": "arn:aws:iam::364680233920:role/ecsTaskExecutionRole",
     "containerDefinitions": [
         {
-            "name": "backend-container",
-            "image": "364680233920.dkr.ecr.ap-southeast-1.amazonaws.com/kbb-backend:latest",
+            "name": "frontend-container",
+            "image": "364680233920.dkr.ecr.ap-southeast-1.amazonaws.com/kbb-frontend:latest",
             "cpu": 0,
             "memory": 1000,
             "memoryReservation": 500,
@@ -23,7 +23,7 @@
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "/ecs/kbb-backend-task",
+                    "awslogs-group": "/ecs/kbb-frontend-task",
                     "awslogs-region": "ap-southeast-1",
                     "awslogs-stream-prefix": "ecs"
                 }

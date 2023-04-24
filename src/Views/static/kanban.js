@@ -36,7 +36,8 @@ window.app = new Vue({
       let vue_app = this;
       let form = ev.target;
       let form_color = form.color.value;
-
+      alert('TEST')
+      console.log('WRITE SOMETHING')
       fetch(form.action, {
         method: 'POST',
         body: new FormData(form)

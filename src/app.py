@@ -1,6 +1,7 @@
 #### App.py code
 
 from flask import Flask, flash, render_template, Response, request, redirect, url_for
+import cards
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
@@ -22,7 +23,8 @@ def success():
     # placeholder logic to implement authentication checks later
 
     if (pw == "admin"):
-        return render_template('index-placeholder.html')
+        # return render_template('index-placeholder.html')
+        return render_template('index.html')
         #return render_template('main-page.html') - for debugging
         #render the main page if auth checks are ok
     else:

@@ -11,7 +11,7 @@
 
 window.app = new Vue({
   data: {
-    cards: [],
+    cards: [], // Ask when will this be populated? Find the logic that helps to populate this...
     columns: [],
     edit_card: null,
     show_archived_cards: false,
@@ -32,12 +32,12 @@ window.app = new Vue({
         this.edit_card = null;
       }
     },
-    create_card: function (ev) {
+    create_card: function (ev) { // Create card function
       let vue_app = this;
       let form = ev.target;
       let form_color = form.color.value;
-
-      axios.post(form.action, new FormData(form)).then(function () {
+      console.log('WRITE SOMETHING')
+      axios.post(form.action, new FormData(form)).then(function () { // This line posts the form data
         vue_app.refresh_cards();
         form.reset();
         vue_app.$refs.new_card_color.value = form_color;
@@ -60,7 +60,7 @@ window.app = new Vue({
         });
       }
     },
-    get_card: function (id) {
+    get_card: function (id) { // Get cards, read array only
       let target = id;
 
       if (typeof target === "string") {
@@ -77,11 +77,11 @@ window.app = new Vue({
         this.edit_card = null;
       }
     },
-    refresh_cards: function () {
+    refresh_cards: function () { // Add cards, grabs the cards data then store it in response.data and then insert into vue_app.cards
       let vue_app = this;
 
       axios.get("cards").then(function (response) {
-        vue_app.cards = response.data;
+        vue_app.cards = response.data; // I have to change this to speak to the backend api
       });
     },
     refresh_columns: function () {

@@ -202,7 +202,7 @@
   <div id="kanban" v-cloak>
     <header>
       <h1>Kanban board</h1>
-      <form v-on:submit.prevent="kanban/create_card" action="card" method="POST">
+      <form v-on:submit.prevent="create_card" action="card" method="POST">
         <input title="create card" src="static/plus_icon.svg" type="image" value="Create card" />
         <label>text: <input name="text" type="text" required="required" /></label>
         <label>colour: <input ref="new_card_color" title="Select colour" name="color" type="color" /></label>
@@ -261,7 +261,8 @@
         href="https://github.com/FloatingOctothorpe/python-kanban">GitHub</a>.
     </small>
   </footer>
-  <script src="static/vue.min.js"></script>
-  <script src="static/kanban.js"></script>
+  <script src="../static/vue.min.js"></script>
+  <script src="../static/axios.min.js"></script>
+  <script src="../static/kanban.js"></script>
 </body>
 </html>

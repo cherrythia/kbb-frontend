@@ -12,7 +12,7 @@
 window.app = new Vue({
   data: {
     cards: [], // Ask when will this be populated? Find the logic that helps to populate this...
-    columns: [],
+    columns: ["waiting", "doing", "done"],
     edit_card: null,
     show_archived_cards: false,
     show_card_ids: false,
@@ -87,13 +87,13 @@ window.app = new Vue({
     refresh_columns: function () {
       let vue_app = this;
 
-      axios.get("columns").then(function (response) {
-        vue_app.columns = response.data;
-        document.documentElement.style.setProperty(
-          "--kanban-columns",
-          vue_app.columns.length
-        );
-      });
+      // axios.get("columns").then(function (response) {
+      //   vue_app.columns = response.data;
+      //   document.documentElement.style.setProperty(
+      //     "--kanban-columns",
+      //     vue_app.columns.length
+      //   );
+      // });
     },
     start_card_edit: function (card_id) {
       this.edit_card = this.get_card(card_id);
@@ -122,13 +122,13 @@ window.app = new Vue({
   }
 });
 
-function dragstart_handler (ev) {
+function dragstart_handler(ev) {
   // Add the target element's id to the data transfer object
   ev.dataTransfer.setData("text/plain", ev.target.id);
   ev.dropEffect = "move";
 }
 
-function dragover_handler (ev) {
+function dragover_handler(ev) {
   ev.preventDefault();
   // Set the dropEffect to move
   ev.dataTransfer.dropEffect = "move";
@@ -144,7 +144,7 @@ function dragover_handler (ev) {
   }
 }
 
-function dragleave_handler (ev) {
+function dragleave_handler(ev) {
   let container = ev.target;
 
   while (container.tagName !== "SECTION") {
@@ -153,7 +153,7 @@ function dragleave_handler (ev) {
   container.classList.remove("drop-target");
 }
 
-function drop_handler (ev) {
+function drop_handler(ev) {
   ev.preventDefault();
 
   // TODO: handle invalid card ID
@@ -181,7 +181,7 @@ function drop_handler (ev) {
     if (column_cards[i].offsetTop > event_absolute_y) {
       before_id = "all";
       break;
-    // On list item
+      // On list item
     } else if (i < (column_cards.length - 1) && event_absolute_y <= column_cards[i + 1].offsetTop) {
       if (moving_down) {
         before_id = parseInt(column_cards[i + 1].id.replace("card", ""), 10);
@@ -193,7 +193,7 @@ function drop_handler (ev) {
       // On last list item
       if (event_absolute_y < column_cards[i].offsetTop + (column_cards[i].offsetHeight) && card.column !== new_col) {
         before_id = parseInt(column_cards[i].id.replace("card", ""), 10);
-      // Past the end
+        // Past the end
       } else {
         before_id = null;
       }

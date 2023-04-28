@@ -217,7 +217,7 @@
         ondragleave="dragleave_handler(event);">
         <h2>{{ column }}</h2>
         <transition-group tag="ol" name="fade">
-          <li v-bind:id="'card' + card.id" draggable="true"
+        <li v-bind:id="'card' + card.id" draggable="true"
             :key="card.id"
             class="kanban-card"
             v-bind:class="{ archived: card.archived }"
@@ -261,8 +261,8 @@
         href="https://github.com/FloatingOctothorpe/python-kanban">GitHub</a>.
     </small>
   </footer>
-  <script src="../static/vue.min.js"></script>
-  <script src="../static/axios.min.js"></script>
-  <script src="../static/kanban.js"></script>
+  <script src="static/vue.min.js"></script>
+  <script src="static/axios.min.js"></script>
+  <script src="static/kanban.js"></script>
 </body>
 </html>

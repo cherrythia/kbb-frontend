@@ -37,7 +37,15 @@ window.app = new Vue({
       let form = ev.target;
       let form_color = form.color.value;
       console.log('WRITE SOMETHING')
-      axios.post(form.action, new FormData(form)).then(function () { // This line posts the form data
+      axios.post("http://localhost:3001/task/create_task", {
+        user_id: 1,
+        project_id: 1,
+        content: form.text.value,
+      }, {
+        headers: {
+          'content-type': 'application/json'
+        }
+      }).then(function () { // This line posts the form data
         vue_app.refresh_cards();
         form.reset();
         vue_app.$refs.new_card_color.value = form_color;

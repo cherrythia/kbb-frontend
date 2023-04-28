@@ -80,7 +80,7 @@ window.app = new Vue({
     refresh_cards: function () { // Add cards, grabs the cards data then store it in response.data and then insert into vue_app.cards
       let vue_app = this;
 
-      axios.get("cards").then(function (response) {
+      axios.get("http://localhost:3001/task/get_all_task").then(function (response) {
         vue_app.cards = response.data; // I have to change this to speak to the backend api
       });
     },

@@ -1,14 +1,13 @@
 #### App.py code
 
-from flask import Flask, flash, render_template, Response, request, redirect, url_for
-import cards
+from flask import Flask, render_template, request, send_from_directory
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
 
 @app.route("/")
 def index():
-    return render_template('login-page.html', ovalue=0, message ="")
+    return send_from_directory('templates', 'login-page.html')
 
 
 @app.route("/main", methods=["POST"])
@@ -24,11 +23,9 @@ def success():
 
     if (pw == "admin"):
         # return render_template('index-placeholder.html')
-        return render_template('index.html')
-        #return render_template('main-page.html') - for debugging
-        #render the main page if auth checks are ok
+        return send_from_directory('templates', 'index.html')
     else:
-        return render_template('login-page.html', ovalue=1.0, message="Login error: wrong username and/or password")
+        return send_from_directory('templates', 'login-page.html', ovalue=1.0, message="Login error: wrong username and/or password")
          #render the login page again with error message
         
 

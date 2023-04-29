@@ -19,7 +19,7 @@ window.app = new Vue({
     show_card_ids: false,
     show_card_timestamps: false,
   },
-  
+
   el: "#kanban",
   methods: {
     cancel_card_edit: function () {
@@ -38,7 +38,7 @@ window.app = new Vue({
       let vue_app = this;
       let form = ev.target;
       let form_color = form.color.value;
-      
+
       axios.post(BACKEND_HOST_URL.concat("/task/create_task"), {
         user_id: 1,
         project_id: 1,
@@ -89,7 +89,7 @@ window.app = new Vue({
     },
     refresh_cards: function () { // Add cards, grabs the cards data then store it in response.data and then insert into vue_app.cards
       let vue_app = this;
-      
+
       axios.get(BACKEND_HOST_URL.concat("/task/get_all_task")).then(function (response) {
         vue_app.cards = response.data; // I have to change this to speak to the backend api
       });
@@ -118,7 +118,11 @@ window.app = new Vue({
     },
     update_card: function (id) {
       let card = this.get_card(id);
-      axios.put("card/" + card.id, card);
+      axios.post(BACKEND_HOST_URL.concat("/task/update_task"), card, {
+        headers: {
+          'content-type': 'application/json'
+        }
+      });
     },
     update_card_color: function (card_id, ev) {
       this.get_card(card_id).color = ev.target.value;
@@ -168,6 +172,7 @@ function drop_handler(ev) {
 
   // TODO: handle invalid card ID
   let card = window.app.get_card(ev.dataTransfer.getData("text"));
+  console.log("draggable drop", card)
   let container = ev.target;
 
   while (container.tagName !== "SECTION") {
@@ -209,16 +214,21 @@ function drop_handler(ev) {
       }
     }
   }
-  if (column_cards.length > 0 && card.id !== before_id) {
-    axios.post("card/reorder", {
-      before: before_id,
-      card: card.id
-    }).then(function () {
-      window.app.refresh_cards();
-    });
-  }
+
+  // todo: prioritising order
+  // if (column_cards.length > 0 && card.id !== before_id) {
+  //   // update card
+  //   axios.post("card/reorder", {
+  //     before: before_id,
+  //     card: card.id
+  //   }).then(function () {
+  //     window.app.refresh_cards();
+  //   });
+  // }
+
+  // changing columns
   if (card.column !== new_col) {
-    card.column = new_col;
+    card.status = new_col;
     window.app.update_card(card.id);
   }
 }

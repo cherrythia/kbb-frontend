@@ -119,7 +119,11 @@ window.app = new Vue({
     },
     update_card: function (id) {
       let card = this.get_card(id);
-      axios.put("card/" + card.id, card);
+      axios.post(BACKEND_HOST_URL.concat("/task/update_task"), card, {
+        headers: {
+          'content-type': 'application/json'
+        }
+      });
     },
     update_card_color: function (card_id, ev) {
       this.get_card(card_id).color = ev.target.value;
@@ -184,6 +188,7 @@ function drop_handler(ev) {
 
   // TODO: handle invalid card ID
   let card = window.app.get_card(ev.dataTransfer.getData("text"));
+  console.log("draggable drop", card)
   let container = ev.target;
 
   while (container.tagName !== "SECTION") {
@@ -225,16 +230,21 @@ function drop_handler(ev) {
       }
     }
   }
-  if (column_cards.length > 0 && card.id !== before_id) {
-    axios.post("card/reorder", {
-      before: before_id,
-      card: card.id
-    }).then(function () {
-      window.app.refresh_cards();
-    });
-  }
+
+  // todo: prioritising order
+  // if (column_cards.length > 0 && card.id !== before_id) {
+  //   // update card
+  //   axios.post("card/reorder", {
+  //     before: before_id,
+  //     card: card.id
+  //   }).then(function () {
+  //     window.app.refresh_cards();
+  //   });
+  // }
+
+  // changing columns
   if (card.column !== new_col) {
-    card.column = new_col;
+    card.status = new_col;
     window.app.update_card(card.id);
   }
 }

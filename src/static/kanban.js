@@ -11,8 +11,8 @@
 
 window.app = new Vue({
   data: {
-    cards: [],
-    columns: [],
+    cards: [], // Ask when will this be populated? Find the logic that helps to populate this...
+    columns: ["waiting", "doing", "done"],
     edit_card: null,
     show_archived_cards: false,
     show_card_ids: false,
@@ -32,12 +32,20 @@ window.app = new Vue({
         this.edit_card = null;
       }
     },
-    create_card: function (ev) {
+    create_card: function (ev) { // Create card function
       let vue_app = this;
       let form = ev.target;
       let form_color = form.color.value;
-
-      axios.post(form.action, new FormData(form)).then(function () {
+      console.log('WRITE SOMETHING')
+      axios.post("http://localhost:3001/task/create_task", {
+        user_id: 1,
+        project_id: 1,
+        content: form.text.value,
+      }, {
+        headers: {
+          'content-type': 'application/json'
+        }
+      }).then(function () { // This line posts the form data
         vue_app.refresh_cards();
         form.reset();
         vue_app.$refs.new_card_color.value = form_color;
@@ -60,7 +68,7 @@ window.app = new Vue({
         });
       }
     },
-    get_card: function (id) {
+    get_card: function (id) { // Get cards, read array only
       let target = id;
 
       if (typeof target === "string") {
@@ -77,23 +85,23 @@ window.app = new Vue({
         this.edit_card = null;
       }
     },
-    refresh_cards: function () {
+    refresh_cards: function () { // Add cards, grabs the cards data then store it in response.data and then insert into vue_app.cards
       let vue_app = this;
 
-      axios.get("cards").then(function (response) {
-        vue_app.cards = response.data;
+      axios.get("http://localhost:3001/task/get_all_task").then(function (response) {
+        vue_app.cards = response.data; // I have to change this to speak to the backend api
       });
     },
     refresh_columns: function () {
       let vue_app = this;
 
-      axios.get("columns").then(function (response) {
-        vue_app.columns = response.data;
-        document.documentElement.style.setProperty(
-          "--kanban-columns",
-          vue_app.columns.length
-        );
-      });
+      // axios.get("columns").then(function (response) {
+      //   vue_app.columns = response.data;
+      //   document.documentElement.style.setProperty(
+      //     "--kanban-columns",
+      //     vue_app.columns.length
+      //   );
+      // });
     },
     start_card_edit: function (card_id) {
       this.edit_card = this.get_card(card_id);
@@ -122,13 +130,13 @@ window.app = new Vue({
   }
 });
 
-function dragstart_handler (ev) {
+function dragstart_handler(ev) {
   // Add the target element's id to the data transfer object
   ev.dataTransfer.setData("text/plain", ev.target.id);
   ev.dropEffect = "move";
 }
 
-function dragover_handler (ev) {
+function dragover_handler(ev) {
   ev.preventDefault();
   // Set the dropEffect to move
   ev.dataTransfer.dropEffect = "move";
@@ -144,7 +152,7 @@ function dragover_handler (ev) {
   }
 }
 
-function dragleave_handler (ev) {
+function dragleave_handler(ev) {
   let container = ev.target;
 
   while (container.tagName !== "SECTION") {
@@ -153,7 +161,7 @@ function dragleave_handler (ev) {
   container.classList.remove("drop-target");
 }
 
-function drop_handler (ev) {
+function drop_handler(ev) {
   ev.preventDefault();
 
   // TODO: handle invalid card ID
@@ -181,7 +189,7 @@ function drop_handler (ev) {
     if (column_cards[i].offsetTop > event_absolute_y) {
       before_id = "all";
       break;
-    // On list item
+      // On list item
     } else if (i < (column_cards.length - 1) && event_absolute_y <= column_cards[i + 1].offsetTop) {
       if (moving_down) {
         before_id = parseInt(column_cards[i + 1].id.replace("card", ""), 10);
@@ -193,7 +201,7 @@ function drop_handler (ev) {
       // On last list item
       if (event_absolute_y < column_cards[i].offsetTop + (column_cards[i].offsetHeight) && card.column !== new_col) {
         before_id = parseInt(column_cards[i].id.replace("card", ""), 10);
-      // Past the end
+        // Past the end
       } else {
         before_id = null;
       }

@@ -31,7 +31,6 @@ def success():
     # print(pw) - for debugging
 
     # placeholder logic to implement authentication checks later
-    return send_from_directory('templates', 'index.html')
     if (pw == "admin"):
         # return render_template('index-placeholder.html')
         return send_from_directory('templates', 'index.html')

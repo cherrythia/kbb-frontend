@@ -239,6 +239,29 @@ function drop_handler(ev) {
   }
 }
 
+// Create project function
+function create_project (ev) { 
+  let vue_app = this;
+  let form = ev.target;
+  console.log('create project')
+  axios.post("http://localhost:3001/project/create_project", {
+    
+    name: form.project_name.value,
+    content: form.description.value,
+    }, 
+    
+    {
+      headers: {
+      'content-type': 'application/json'
+      }
+    }).then(function () { // This line posts the form data
+    
+      vue_app.refresh_cards();
+      form.reset();
+      vue_app.$refs.new_card_color.value = form_color;
+    });
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   window.app.init();
 });

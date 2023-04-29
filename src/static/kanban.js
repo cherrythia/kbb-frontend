@@ -20,7 +20,7 @@ window.app = new Vue({
     show_card_timestamps: false,
     allUsers: [],
   },
-  
+
   el: "#kanban",
   methods: {
     cancel_card_edit: function () {
@@ -39,7 +39,7 @@ window.app = new Vue({
       let vue_app = this;
       let form = ev.target;
       let form_color = form.color.value;
-      
+
       axios.post(BACKEND_HOST_URL.concat("/task/create_task"), {
         user_id: 1,
         project_id: 1,
@@ -90,7 +90,7 @@ window.app = new Vue({
     },
     refresh_cards: function () { // Add cards, grabs the cards data then store it in response.data and then insert into vue_app.cards
       let vue_app = this;
-      
+
       axios.get(BACKEND_HOST_URL.concat("/task/get_all_task")).then(function (response) {
         vue_app.cards = response.data; // I have to change this to speak to the backend api
       });
@@ -127,7 +127,7 @@ window.app = new Vue({
     },
     get_all_users: function () {
       let vue_app = this;
-      
+
       axios.get(BACKEND_HOST_URL.concat("/user")).then(function (response) {
         vue_app.allUsers = response.data; // I have to change this to speak to the backend api
       });
@@ -240,22 +240,22 @@ function drop_handler(ev) {
 }
 
 // Create project function
-function create_project (ev) { 
+function create_project(ev) {
   let vue_app = this;
   let form = ev.target;
   console.log('create project')
-  axios.post("http://localhost:3001/project/create_project", {
-    
+  axios.post(BACKEND_HOST_URL.concat("/project/create_project"), {
+
     name: form.project_name.value,
     content: form.description.value,
-    }, 
-    
+  },
+
     {
       headers: {
-      'content-type': 'application/json'
+        'content-type': 'application/json'
       }
     }).then(function () { // This line posts the form data
-    
+
       vue_app.refresh_cards();
       form.reset();
       vue_app.$refs.new_card_color.value = form_color;

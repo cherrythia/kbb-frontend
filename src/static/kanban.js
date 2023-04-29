@@ -9,6 +9,7 @@
 /* eslint id-length: ["error", { "exceptions": ["i"] }] */
 /* eslint no-magic-numbers: ["error", { "ignore": [0, 1] }] */
 
+
 window.app = new Vue({
   data: {
     cards: [], // Ask when will this be populated? Find the logic that helps to populate this...
@@ -16,8 +17,9 @@ window.app = new Vue({
     edit_card: null,
     show_archived_cards: false,
     show_card_ids: false,
-    show_card_timestamps: false
+    show_card_timestamps: false,
   },
+  
   el: "#kanban",
   methods: {
     cancel_card_edit: function () {
@@ -36,8 +38,8 @@ window.app = new Vue({
       let vue_app = this;
       let form = ev.target;
       let form_color = form.color.value;
-      console.log('WRITE SOMETHING')
-      axios.post("http://localhost:3001/task/create_task", {
+      
+      axios.post(BACKEND_HOST_URL.concat("/task/create_task"), {
         user_id: 1,
         project_id: 1,
         content: form.text.value,
@@ -87,8 +89,8 @@ window.app = new Vue({
     },
     refresh_cards: function () { // Add cards, grabs the cards data then store it in response.data and then insert into vue_app.cards
       let vue_app = this;
-
-      axios.get("http://localhost:3001/task/get_all_task").then(function (response) {
+      
+      axios.get(BACKEND_HOST_URL.concat("/task/get_all_task")).then(function (response) {
         vue_app.cards = response.data; // I have to change this to speak to the backend api
       });
     },

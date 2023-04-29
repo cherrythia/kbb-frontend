@@ -18,6 +18,7 @@ window.app = new Vue({
     show_archived_cards: false,
     show_card_ids: false,
     show_card_timestamps: false,
+    allUsers: [],
   },
   
   el: "#kanban",
@@ -124,9 +125,24 @@ window.app = new Vue({
       this.get_card(card_id).color = ev.target.value;
       this.update_card(card_id);
     },
+    get_all_users: function () {
+      let vue_app = this;
+      
+      axios.get(BACKEND_HOST_URL.concat("/user")).then(function (response) {
+        vue_app.allUsers = response.data; // I have to change this to speak to the backend api
+      });
+    },
+    get_assigned_user: function (email) {
+      if (email.includes('@')) {
+        return email.split('@')[0];
+      } else {
+        return email;
+      }
+    },
     init: function () {
       this.refresh_columns();
       this.refresh_cards();
+      this.get_all_users();
       this.$refs.new_card_color.value = getComputedStyle(document.documentElement).getPropertyValue("--default-card-color").replace(/ /g, "");
     }
   }

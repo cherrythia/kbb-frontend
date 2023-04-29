@@ -264,6 +264,10 @@
               <img src="static/edit_icon.svg" alt="edit" />
             </a>
             <span class="card_id" v-show="show_card_ids"><small>#{{ card.id }}</small></span>
+            <template v-for="user in allUsers" v-if="user.id === card.user_id">
+              <p class="card-text">Assigned {{ get_assigned_user(user.user_email) }}</p>
+            </template>
+            <p class="card-text">Project {{ card.project_id }}</p>
             <p class="card-text">{{ card.content }}</p>
             <p class="card-last-updated"><small v-show="show_card_timestamps"> Update {{ Math.floor((Date.now() -
                 Date.parse(card.modified)) / (1000*60*60*24)) }} day(s) ago</small></p>

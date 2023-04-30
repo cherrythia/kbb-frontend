@@ -58,18 +58,20 @@ window.app = new Vue({
       let vue_app = this;
 
       if (window.confirm("Delete card?")) {
-        axios.delete("card/" + card_id).then(function () {
+        axios.post(BACKEND_HOST_URL.concat("/task/delete_task"), null, {
+          params: {
+            id: card_id
+          }
+        }).then(function () {
           for (let i = 0; i < vue_app.cards.length; i += 1) {
             if (vue_app.cards[i].id === card_id) {
               vue_app.edit_card = null;
               delete vue_app.cards[i];
               vue_app.cards.splice(i, 1);
-
-              return;
             }
           }
         });
-      }
+      }          
     },
     get_card: function (id) { // Get cards, read array only
       let target = id;

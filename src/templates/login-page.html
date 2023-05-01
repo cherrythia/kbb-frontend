@@ -17,24 +17,68 @@
     <img src="/static/logo.jpg" alt="NUS-ISS Logo">
     <h1 id="login-header">NUS KBB Login Page</h1>
     
-    <div id="login-error-msg-holder" style="--opacityvalue: {{ovalue}};">
+<!--     <div id="login-error-msg-holder" style="--opacityvalue : 0.0;">
       <p id="login-error-msg">Invalid username <span id="error-msg-second-line">and/or password</span></p>
-    </div>
+    </div> -->
     
     <div id="test-msg-holder">
       <p id="test-msg">[For testing purpose, the default username and pw is admin]</p>
     </div>
 
-    <form id="login-form" action="/auth" method="post">
+    <form id="loginForm" action="">
       <input type="text" name="username" id="username-field" class="login-form-field" placeholder="Username">
+      <br>
       <input type="password" name="password" id="password-field" class="login-form-field" placeholder="Password">
-      <input type="submit" value="Login" id="login-form-submit">
+      <input type="button" onclick="check(this.form)" value="Login" id="login-form-submit">
     </form>
   
+    <!-- Javascript to handle username and password auth checks -->
+    <script> 
+      function check(form)
+      {
+        let input_name = form.username.value;
+        let input_pw =form.password.value;
+        let result = true ;
+      
+        axios.post(BACKEND_HOST_URL.concat("/user"), {
+          user_email: input_name,
+          user_password: input_pw,
+          
+        }, {
+          headers: {
+            'content-type': 'application/json'
+          }
+        })
+        .then((response) => {
+          console.log(response.data);
+          result=response.data;
+        }, (error) => {
+          console.log(error);
+          });
+
+        if (result == true) {
+          
+          // auth check pass, redirect to main page
+          location.replace(BACKEND_HOST_URL.concat("/main"));
+        } 
+        else 
+        {  
+          // auth check fail, redirect to main page
+          alert("Wrong username or pw submitted!");
+          location.replace("http://localhost:3000")
+        }
+      };
+    </script>
+
+
   </main>
+
+  <script src="static/axios.min.js"></script>
+  <script type="module" src="static/config.js"></script>
+
 </body>
 
-<h2>{{ message }}</h2>
+<!-- <h2>{{ message }}</h2> -->
 
 
 </html>

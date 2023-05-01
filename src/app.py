@@ -21,27 +21,10 @@ app = setup_app() # pylint: disable=invalid-name
 @app.route("/")
 def index():
     return send_from_directory('templates', 'login-page.html')
-    #return render_template('login-page.html', ovalue=0, message ="")
 
-# test 
 @app.route("/main", methods=["POST", "GET"])
 def success():    
     return send_from_directory('templates', 'index.html')
-
-    #placeholder block for handling the HTTP POST request after form submission 
-    #name = request.form.get('username')    
-    #pw = request.form.get('password')     
-    # print(name) - for debugging
-    # print(pw) - for debugging
-
-    # placeholder logic to implement authentication checks later
-    #if (pw == "admin"):
-        # return render_template('index-placeholder.html')
-    #    return send_from_directory('templates', 'index.html')
-    #else:
-        #return send_from_directory('templates', 'login-page.html', ovalue=1.0, message="Login error: wrong username and/or password")
-        #return render_template('login-page.html', ovalue=1.0, message="Login error: wrong username and/or password")
-        #render the login page again with error message
 
 # for internal testing only; logic for auth check
 @app.route("/auth", methods=["POST"])

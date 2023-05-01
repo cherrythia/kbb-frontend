@@ -28,9 +28,9 @@ window.app = new Vue({
     },
     complete_card_edit: function (card_id) {
       if (this.edit_card) {
-        this.edit_card.text = this.$refs.card_edit_text.value;
-        this.edit_card.color = this.$refs.card_edit_color.value;
-        this.edit_card.archived = this.$refs.card_edit_archive.checked;
+        this.edit_card.content = this.$refs.card_edit_input.value;
+        this.edit_card.status = this.$refs.card_edit_status.value;
+        this.edit_card.user_id = this.$refs.card_edit_assigned.value;
         this.update_card(card_id);
         this.edit_card = null;
       }
@@ -58,18 +58,20 @@ window.app = new Vue({
       let vue_app = this;
 
       if (window.confirm("Delete card?")) {
-        axios.delete("card/" + card_id).then(function () {
+        axios.post(BACKEND_HOST_URL.concat("/task/delete_task"), null, {
+          params: {
+            id: card_id
+          }
+        }).then(function () {
           for (let i = 0; i < vue_app.cards.length; i += 1) {
             if (vue_app.cards[i].id === card_id) {
               vue_app.edit_card = null;
               delete vue_app.cards[i];
               vue_app.cards.splice(i, 1);
-
-              return;
             }
           }
         });
-      }
+      }          
     },
     get_card: function (id) { // Get cards, read array only
       let target = id;
@@ -112,17 +114,23 @@ window.app = new Vue({
       let vue_app = this;
 
       Vue.nextTick(function () {
-        vue_app.$refs.card_edit_text.value = vue_app.edit_card.text;
-        vue_app.$refs.card_edit_text.focus();
-        vue_app.$refs.card_edit_text.select();
+        vue_app.$refs.card_edit_input.value = vue_app.edit_card.content;
+        vue_app.$refs.card_edit_status.value = vue_app.edit_card.status;
+        vue_app.$refs.card_edit_assigned.value = vue_app.edit_card.user_id;
       });
     },
     update_card: function (id) {
-      let card = this.get_card(id);
-      axios.post(BACKEND_HOST_URL.concat("/task/update_task"), card, {
+      let vue_app = this;
+      let edit_card = this.edit_card;
+      if (edit_card === null) {
+        edit_card = this.get_card(id);
+      } 
+      axios.post(BACKEND_HOST_URL.concat("/task/update_task"), edit_card, {
         headers: {
           'content-type': 'application/json'
         }
+      }).then(function () {
+        vue_app.refresh_cards();
       });
     },
     update_card_color: function (card_id, ev) {

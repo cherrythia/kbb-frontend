@@ -328,13 +328,19 @@
         v-if="edit_card !== null" v-on:click="handle_card_edit_click">
         <div id="card_edit">
           <form v-on:submit.prevent="complete_card_edit(edit_card.id, $event)" action="#" method="PUT">
-            <label class="color-label">Background color: <input title="Select colour" ref="card_edit_color" type="color"
-                v-bind:value="edit_card.color" /></label>
-            <label class="archived-label">Archived?: <input title="Archive card" ref="card_edit_archive" type="checkbox"
-                v-bind:checked="edit_card.archived" /></label>
+            <label class="color-label">Assigned: 
+              <select id="assigneduser" name="assigneduser"  v-bind:value="edit_card.user_id" ref="card_edit_assigned">
+                <option  v-for="user in allUsers" :value="user.id">{{ get_assigned_user(user.user_email) }}</option>
+              </select>
+            <br />
+            <label class="color-label">Status: 
+              </select>
+              <select id="status" name="status" v-bind:value="edit_card.status" ref="card_edit_status">
+                <option  v-for="status in columns" :value="status">{{ status }}</option>
+              </select>
             <br />
             <textarea v-on:keyup.ctrl.Enter="complete_card_edit(edit_card.id, $event)"
-              ref="card_edit_text">{{edit_card.text}}</textarea>
+              ref="card_edit_input">{{edit_card.content}}</textarea>
             <input class="save-card" type="submit" value="save" />
           </form>
           <button class="delete-card" v-on:click.once="delete_card(edit_card.id, $event)">delete card</button>

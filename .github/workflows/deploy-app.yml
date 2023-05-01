@@ -55,6 +55,7 @@ jobs:
     - name: Update env variable in config.js
       run: |
         sed -i "s|([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#\.]?[\w-]+)*\/?|${{ vars.BACKENDURL }}|g" $CONFIG_FILE
+        cat $CONFIG_FILE
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1

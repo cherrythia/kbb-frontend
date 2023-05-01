@@ -52,6 +52,7 @@
           console.log(result)
           sessionStorage.setItem("user_email", result.user_email)
           location.href = "main"
+          sessionStorage.setItem("loginUser", JSON.stringify(result));
         }
         else {
           alert("Wrong username or pw submitted!");

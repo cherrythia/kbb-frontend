@@ -1,6 +1,6 @@
 #### App.py code
 
-from flask import Flask, flash, render_template, Response, request, redirect, url_for, send_from_directory
+from flask import Flask, request, redirect, url_for, send_from_directory, session
 from flask.json import jsonify
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
@@ -23,7 +23,7 @@ def index():
     return send_from_directory('templates', 'login-page.html')
 
 @app.route("/main", methods=["POST", "GET"])
-def success():    
+def success():
     return send_from_directory('templates', 'index.html')
 
 # for internal testing only; logic for auth check
@@ -53,4 +53,4 @@ def user():
 
 
 if __name__=='__main__':
-    app.run(host="localhost",port=3000, debug = True)
+    app.run(host="localhost",port=8080, debug = True)

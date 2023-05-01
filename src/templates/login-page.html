@@ -5,19 +5,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <title>NUS KBB Login Page</title>
   <link rel="stylesheet" href="/static/login-page.css">
-  
+
 </head>
 
 <body>
   <div id="main-holder">
-    
+
     <img src="/static/logo.jpg" alt="NUS-ISS Logo">
     <h1 id="login-header">NUS KBB Login Page</h1>
-    
-    
+
+
     <div id="test-msg-holder">
       <p id="test-msg">[For testing purpose, the default username and pw is admin]</p>
     </div>
@@ -31,11 +31,10 @@
   </div>
   <script src="static/axios.min.js"></script>
   <script type="module" src="static/config.js"></script>
-  <script> 
-    function authenticate(form)
-    {
+  <script>
+    function authenticate(form) {
       let input_name = form.username.value;
-      let input_pw =form.password.value;
+      let input_pw = form.password.value;
       let result = null;
 
       if (input_name == "" || input_pw == "admin") {
@@ -48,12 +47,13 @@
           userEmail: input_name
         }
       }).then((response) => {
-        result=response.data;
+        result = response.data;
         if (result.user_password == input_pw) {
+          console.log(result)
+          sessionStorage.setItem("user_email", result.user_email)
           location.href = "main"
         }
-        else 
-        {
+        else {
           alert("Wrong username or pw submitted!");
         }
       }, (error) => {

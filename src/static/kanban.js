@@ -40,9 +40,11 @@ window.app = new Vue({
       let form = ev.target;
       let form_color = form.color.value;
 
+      let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
+
       axios.post(BACKEND_HOST_URL.concat("/task/create_task"), {
-        user_id: 1,
-        project_id: 1,
+        user_id: loginUser.id,
+        project_id: loginUser.project_id,
         content: form.text.value,
       }, {
         headers: {
@@ -93,7 +95,13 @@ window.app = new Vue({
     refresh_cards: function () { // Add cards, grabs the cards data then store it in response.data and then insert into vue_app.cards
       let vue_app = this;
 
-      axios.get(BACKEND_HOST_URL.concat("/task/get_all_task")).then(function (response) {
+      let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
+
+      axios.get(BACKEND_HOST_URL.concat("/task/get_task"), {
+        params: {
+          project_id: loginUser.project_id
+        }
+      }).then(function (response) {
         vue_app.cards = response.data; // I have to change this to speak to the backend api
       });
     },
@@ -139,8 +147,13 @@ window.app = new Vue({
     },
     get_all_users: function () {
       let vue_app = this;
+      let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
 
-      axios.get(BACKEND_HOST_URL.concat("/user")).then(function (response) {
+      axios.get(BACKEND_HOST_URL.concat("/user/get_user_by_project_id"), {
+        params: {
+          projectId: loginUser.project_id
+        }
+      }).then(function (response) {
         vue_app.allUsers = response.data; // I have to change this to speak to the backend api
       });
     },

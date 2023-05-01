@@ -51,6 +51,7 @@
         result=response.data;
         if (result.user_password == input_pw) {
           location.href = "main"
+          sessionStorage.setItem("loginUser", JSON.stringify(result));
         }
         else 
         {

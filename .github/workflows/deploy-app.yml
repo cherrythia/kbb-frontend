@@ -52,7 +52,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     
-    - name: Update env variables in task definition
+    - name: Update env variable in config.js
       run: |
         sed -i "s|([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#\.]?[\w-]+)*\/?|${{ vars.BACKENDURL }}|g" $CONFIG_FILE
 

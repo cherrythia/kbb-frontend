@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  frontend:
+    container_name: kbb-frontend
+    image: kbb-frontend:${Frontend_TAG}
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - 8080:8080
+    # todo: add port mapping

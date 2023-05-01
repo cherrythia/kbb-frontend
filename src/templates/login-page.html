@@ -12,29 +12,56 @@
 </head>
 
 <body>
-  <main id="main-holder">
+  <div id="main-holder">
     
     <img src="/static/logo.jpg" alt="NUS-ISS Logo">
     <h1 id="login-header">NUS KBB Login Page</h1>
     
-    <div id="login-error-msg-holder" style="--opacityvalue: {{ovalue}};">
-      <p id="login-error-msg">Invalid username <span id="error-msg-second-line">and/or password</span></p>
-    </div>
     
     <div id="test-msg-holder">
       <p id="test-msg">[For testing purpose, the default username and pw is admin]</p>
     </div>
 
-    <form id="login-form" action="/main" method="post">
-      <input type="text" name="username" id="username-field" class="login-form-field" placeholder="Username">
-      <input type="password" name="password" id="password-field" class="login-form-field" placeholder="Password">
-      <input type="submit" value="Login" id="login-form-submit">
+    <form id="loginForm" action="">
+      <input type="text" name="username" id="username-field" class="login-form-field" placeholder="username">
+      <br>
+      <input type="password" name="password" id="password-field" class="login-form-field" placeholder="password">
+      <input type="button" onclick="authenticate(this.form)" value="Login" id="login-form-submit">
     </form>
-  
-  </main>
-</body>
+  </div>
+  <script src="static/axios.min.js"></script>
+  <script type="module" src="static/config.js"></script>
+  <script> 
+    function authenticate(form)
+    {
+      let input_name = form.username.value;
+      let input_pw =form.password.value;
+      let result = null;
 
-<h2>{{ message }}</h2>
+      if (input_name == "" || input_pw == "admin") {
+        location.href = "main"
+        return;
+      }
+
+      axios.get(BACKEND_HOST_URL.concat("/user"), {
+        params: {
+          userEmail: input_name
+        }
+      }).then((response) => {
+        result=response.data;
+        if (result.user_password == input_pw) {
+          location.href = "main"
+        }
+        else 
+        {
+          alert("Wrong username or pw submitted!");
+        }
+      }, (error) => {
+        console.log(error);
+      });
+    };
+  </script>
+</body>
 
 
 </html>

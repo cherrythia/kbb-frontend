@@ -198,7 +198,7 @@
       background: var(--light-background);
       display: block;
       top: 200px;
-      width: 400px;
+      width: 450px;
       left: calc(50% - 200px - 1.2em);
       padding: 1.2em;
       border-radius: 1em;
@@ -236,6 +236,22 @@
     .fade-move {
       transition: transform 0.3s;
     }
+
+    .parent {
+      /* border: 1px solid black; */
+      /*margin: 1rem;
+      padding: 2rem 2rem;*/
+      text-align: left;
+    }
+    
+    .child {
+      display: inline-block;
+      /* border: 1px solid red; */
+      padding: 0.2rem 0.2rem;
+      vertical-align: left;
+    }
+
+
   </style>
 
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
@@ -281,12 +297,52 @@
                   <div class="form-group">
                       <input type="text" name="description" class="form-control" placeholder="Description">
                   </div>
-                  <button type="submit" class="btn btn-primary">Submit</button>
+                  <button type="submit" class="btn btn-primary">Create</button>
+                  <br>
+                  <br>
+                  <div>
+                    <button id="generate" type="button" class="btn btn-primary">Join Project</button>
+                  </div>
+                  <div id="container"></div>
               </form>
           </div>
       </div>
   </div>
 </div>
+
+<!-- script for dynamic dropdown menu for 'Join project' button -->
+<script>
+  document.getElementById('generate').onclick = function() {
+   
+      var values = ["Project1", "Project2", "Project3"];
+   
+      var select = document.createElement("select");
+      select.name = "projects";
+      select.id = "projects"
+   
+      for (const val of values)
+      {
+          var option = document.createElement("option");
+          option.value = val;
+          option.text = val.charAt(0).toUpperCase() + val.slice(1);
+          select.appendChild(option);
+      }
+   
+      var label = document.createElement("label");
+      label.innerHTML = "Choose your project: "
+      label.htmlFor = "projects";
+   
+      document.getElementById("container").appendChild(label).appendChild(select);
+  }
+
+  document.getElementById('select').onclick = function() {
+    let x=document.getElementById('select').value;
+    console.log(x);
+    location.assign("https://www.w3schools.com");
+  }
+
+  </script>
+
 
 <body onpageshow="checkProject()">
   <noscript>
@@ -301,6 +357,27 @@
         <label>colour: <input ref="new_card_color" title="Select colour" name="color" type="color" /></label>
       </form>
     </header>
+
+    <div class='parent'>
+      <div class='child'>
+
+        <!-- logout button  -->
+        <form id="logout-form" action="/" method="get">
+          <input type="submit" value="Logout" id="logout-form-submit">
+        </form>
+      </div>
+
+      <div class='child'>
+        
+        <!-- delete project button  -->
+          <form id="delete-project-form" action="project/delete_project" method="POST">
+            <input type="submit" value="Delete Project" id="delete-project-submit">
+          </form>
+      </div>
+    </div>
+
+    <!-- display columns -->
+
     <div id="kanban-cols">
       <section class="column" v-bind:id="'column' + index" v-for="(column, index) in columns"
         ondrop="drop_handler(event);" ondragover="dragover_handler(event);" ondragleave="dragleave_handler(event);">

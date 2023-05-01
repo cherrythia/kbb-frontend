@@ -41,7 +41,8 @@ html {
     color: #8a0000;
     border: 1px solid #8a0000;
     background-color: #e58f8f;
-    opacity: var(--opacityvalue);
+    opacity: 0.0
+    /* opacity: var(--opacityvalue); */
   }
   
   #error-msg-second-line {
@@ -69,7 +70,7 @@ html {
   }
   
   #login-form-submit {
-    width: 100%;
+    width: 55%;
     padding: 7px;
     border: none;
     border-radius: 5px;

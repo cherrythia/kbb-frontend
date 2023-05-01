@@ -114,14 +114,13 @@ window.app = new Vue({
       let vue_app = this;
 
       Vue.nextTick(function () {
-        vue_app.$refs.card_edit.value = vue_app.edit_card.content;
-        vue_app.$refs.card_edit.status = vue_app.edit_card.status;
-        vue_app.$refs.card_edit.user_id = vue_app.edit_card.user_id;
-        vue_app.$refs.card_edit.focus();
-        vue_app.$refs.card_edit.select();
+        vue_app.$refs.card_edit_input.value = vue_app.edit_card.content;
+        vue_app.$refs.card_edit_status.value = vue_app.edit_card.status;
+        vue_app.$refs.card_edit_assigned.value = vue_app.edit_card.user_id;
       });
     },
     update_card: function (id) {
+      let vue_app = this;
       let edit_card = this.edit_card;
       if (edit_card === null) {
         edit_card = this.get_card(id);
@@ -130,6 +129,8 @@ window.app = new Vue({
         headers: {
           'content-type': 'application/json'
         }
+      }).then(function () {
+        vue_app.refresh_cards();
       });
     },
     update_card_color: function (card_id, ev) {

@@ -16,7 +16,7 @@ app = setup_app() # pylint: disable=invalid-name
 def index():
     return send_from_directory('templates', 'login-page.html')
 
-@app.route("/main", methods=["POST", "GET"])
+@app.route("/main", methods=["GET"])
 def success():    
     return send_from_directory('templates', 'index.html')
 

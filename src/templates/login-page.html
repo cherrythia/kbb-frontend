@@ -27,6 +27,7 @@
       <br>
       <input type="password" name="password" id="password-field" class="login-form-field" placeholder="password">
       <input type="button" onclick="authenticate(this.form)" value="Login" id="login-form-submit">
+      <input type="button" onclick="signup(this.form)" value="Signup" id="signup-form-submit">
     </form>
   </div>
   <script src="static/axios.min.js"></script>
@@ -59,6 +60,33 @@
         console.log(error);
       });
     };
+
+    function signup(form) {
+      let input_name = form.username.value;
+      let input_pw = form.password.value;
+
+      axios.post(BACKEND_HOST_URL.concat("/user"), {
+        "user_email": input_name,
+        "user_password": input_pw,
+      }, {
+        headers: {
+          'content-type': 'application/json'
+        }
+      }).catch(function (error) {
+        alert(error.response.data)
+      }).then((response) => {
+        result = response.data;
+        if (result.user_email != null) {
+          location.href = "main"
+          sessionStorage.setItem("loginUser", JSON.stringify(result));
+        }
+        else {
+          alert(result);
+        }
+      }, (error) => {
+        console.log(error);
+      })
+    }
   </script>
 </body>
 

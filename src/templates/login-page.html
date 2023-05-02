@@ -49,8 +49,6 @@
       }).then((response) => {
         result = response.data;
         if (result.user_password == input_pw) {
-          console.log(result)
-          sessionStorage.setItem("user_email", result.user_email)
           location.href = "main"
           sessionStorage.setItem("loginUser", JSON.stringify(result));
         }

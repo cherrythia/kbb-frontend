@@ -260,20 +260,20 @@
 
 <script>
 
-  // function checkProject() {
-  //   let projectNotExist=true // hard code for testing first
+  function checkProject() {
+    let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
 
-  //   //axios.get("project/get_projects").then(function (response) {
-  //     //console.log(response.data);
-  //     //projectlist = response.data;
-  //     //}
+    //axios.get("project/get_projects").then(function (response) {
+    //console.log(response.data);
+    //projectlist = response.data;
+    //}
 
-  //   // implement logic to check if user is tagged to any project
-
-  //   if (Boolean(projectNotExist)) {
-  //     showProjectModal();
-  //   }
-  // }
+    // implement logic to check if user is tagged to any project
+    console.log(loginUser)
+    if (Boolean(loginUser.project_id == null)) {
+      showProjectModal();
+    }
+  }
 
   function showProjectModal() {
     $("#myModal").modal('show');

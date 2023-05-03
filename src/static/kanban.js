@@ -24,11 +24,6 @@ window.app = new Vue({
 
   el: "#kanban",
   methods: {
-    checkProject() {
-      if (Boolean(user.project_id != null)) {
-        showProjectModal();
-      }
-    },
     cancel_card_edit: function () {
       this.edit_card = null;
     },
@@ -183,7 +178,7 @@ window.app = new Vue({
     init: function () {
       this.refresh_columns();
       this.refresh_cards();
-      this.get_all_users();
+      // this.get_all_users();
       this.$refs.new_card_color.value = getComputedStyle(document.documentElement).getPropertyValue("--default-card-color").replace(/ /g, "");
     }
   }
@@ -287,27 +282,27 @@ function drop_handler(ev) {
 }
 
 // Create project function
-function create_project(ev) {
-  let vue_app = this;
-  let form = ev.target;
-  console.log('create project')
-  axios.post(BACKEND_HOST_URL.concat("/project/create_project"), {
+// function create_project(ev) {
+//   let vue_app = this;
+//   let form = ev.target;
+//   console.log('create project')
+//   axios.post(BACKEND_HOST_URL.concat("/project/create_project"), {
 
-    name: form.project_name.value,
-    content: form.description.value,
-  },
+//     name: form.project_name.value,
+//     content: form.description.value,
+//   },
 
-    {
-      headers: {
-        'content-type': 'application/json'
-      }
-    }).then(function () { // This line posts the form data
+//     {
+//       headers: {
+//         'content-type': 'application/json'
+//       }
+//     }).then(function () { // This line posts the form data
 
-      vue_app.refresh_cards();
-      form.reset();
-      vue_app.$refs.new_card_color.value = form_color;
-    });
-}
+//       vue_app.refresh_cards();
+//       form.reset();
+//       vue_app.$refs.new_card_color.value = form_color;
+//     });
+// }
 
 document.addEventListener("DOMContentLoaded", function () {
   window.app.init();

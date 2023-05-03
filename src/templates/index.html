@@ -278,6 +278,35 @@
   function showProjectModal() {
     $("#myModal").modal('show');
   }
+
+  function hideProjectModal() {
+    $("#myModal").modal('hide');
+  }
+
+  function create_project(form) {
+    console.log('create project')
+    // todo... bug when create project did not update user side 
+    let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
+
+    axios.post(BACKEND_HOST_URL.concat("/project"), {
+      // params: {
+      //   "user_email": sessionStorage.getItem("loginUser").user_email
+      // },
+      "project_name": form.project_name.value,
+      "content": form.description.value,
+    }, {
+      headers: {
+        'content-type': 'application/json'
+      },
+      params: {
+        user_email: loginUser.user_email
+      }
+    }).catch(function (error) {
+      alert(error.response.data)
+    }).then(function () { // This line posts the form data
+      hideProjectModal()
+    });
+  }
 </script>
 
 <div id="myModal" class="modal fade">
@@ -288,14 +317,15 @@
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="modal-body">
-        <form v-on:submit.prevent="create_project" action="project/create_project" method="POST">
+        <form>
           <div class="form-group">
             <input type="text" name="project_name" class="form-control" placeholder="Project Name">
           </div>
           <div class="form-group">
             <input type="text" name="description" class="form-control" placeholder="Description">
           </div>
-          <button type="submit" class="btn btn-primary">Create</button>
+          <input type="button" onclick="create_project(this.form)" class="btn btn-primary"
+            value="Create Project"></input>
           <br>
           <br>
           <div>

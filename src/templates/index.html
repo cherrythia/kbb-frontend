@@ -263,16 +263,17 @@
   function checkProject() {
     let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
 
-    //axios.get("project/get_projects").then(function (response) {
-    //console.log(response.data);
-    //projectlist = response.data;
-    //}
-
-    // implement logic to check if user is tagged to any project
-    console.log(loginUser)
-    if (Boolean(loginUser.project_id == null)) {
-      showProjectModal();
-    }
+    axios.get(BACKEND_HOST_URL.concat("/user"), {
+      params: {
+        "userEmail": loginUser.user_email
+      }
+    }).then(function (response) {
+      user = response.data;
+      console.log(user)
+      if (Boolean(user.project_id == null)) {
+        showProjectModal();
+      }
+    })
   }
 
   function showProjectModal() {
@@ -341,32 +342,53 @@
 <!-- script for dynamic dropdown menu for 'Join project' button -->
 <script>
   document.getElementById('generate').onclick = function () {
+    value = axios.get(BACKEND_HOST_URL.concat("/project/all_names")).then(function (response) {
+      values = [""]
+      values = values.concat(response.data)
+      console.log(values)
+      var select = document.createElement("select");
+      select.name = "projects";
+      select.id = "projects"
 
-    var values = ["Project1", "Project2", "Project3"];
+      var join = document.createElement("BUTTON")
+      join.innerHTML = "join now"
+      join.id = "join_now"
 
-    var select = document.createElement("select");
-    select.name = "projects";
-    select.id = "projects"
+      for (const val of values) {
+        var option = document.createElement("option");
+        option.value = val;
+        option.text = val;
+        select.appendChild(option);
+      }
 
-    for (const val of values) {
-      var option = document.createElement("option");
-      option.value = val;
-      option.text = val.charAt(0).toUpperCase() + val.slice(1);
-      select.appendChild(option);
-    }
+      var label = document.createElement("label");
+      label.innerHTML = "Choose your project: "
+      label.htmlFor = "projects";
 
-    var label = document.createElement("label");
-    label.innerHTML = "Choose your project: "
-    label.htmlFor = "projects";
-
-    document.getElementById("container").appendChild(label).appendChild(select);
+      document.getElementById("container").appendChild(label).appendChild(select)
+      document.getElementById("container").appendChild(join);
+      document.getElementById(join.id).onclick = function () {
+        user = JSON.parse(sessionStorage.getItem("loginUser"))
+        let selectedValue = document.getElementById(select.id).value;
+        console.log(selectedValue);
+        axios.post(BACKEND_HOST_URL.concat("/project/join_project"), {
+          "user_email": user.user_email,
+          "project_name": selectedValue
+        }, {
+          headers: {
+            'content-type': 'application/json'
+          }
+        }).catch(function (error) {
+          alert(error)
+        }).then(function (response) {
+          hideProjectModal()
+          sessionStorage.setItem("loginUser", JSON.stringify(response.data))
+        }
+        )
+      }
+    })
   }
 
-  document.getElementById('select').onclick = function () {
-    let x = document.getElementById('select').value;
-    console.log(x);
-    location.assign("https://www.w3schools.com");
-  }
 
 </script>
 

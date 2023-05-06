@@ -19,19 +19,34 @@ window.app = new Vue({
     show_card_ids: false,
     show_card_timestamps: false,
     allUsers: [],
+    tempType: null,
     user: null,
+    card_types: ["task", "bug", "story"],
+    project_name : null
   },
 
   el: "#kanban",
   methods: {
     cancel_card_edit: function () {
       this.edit_card = null;
+      this.tempType = null;
     },
     complete_card_edit: function (card_id) {
       if (this.edit_card) {
         this.edit_card.content = this.$refs.card_edit_input.value;
         this.edit_card.status = this.$refs.card_edit_status.value;
+        this.edit_card.type = this.$refs.card_edit_type.value;
         this.edit_card.user_id = this.$refs.card_edit_assigned.value;
+        if (this.tempType == 'bug') {
+          this.edit_card.version = this.$refs.card_edit_temp.value;
+          this.edit_card.story_points = null;
+        } else if (this.tempType == 'story') {
+          this.edit_card.story_points = this.$refs.card_edit_temp.value;
+          this.edit_card.version = null;
+        } else if (this.tempType == 'task') {
+          this.edit_card.story_points = null;
+          this.edit_card.version = null;
+        }
         this.update_card(card_id);
         this.edit_card = null;
       }
@@ -58,10 +73,13 @@ window.app = new Vue({
         user_id: loginUser.id,
         project_id: loginUser.project_id,
         content: form.text.value,
+        type: 'task'
       }, {
         headers: {
           'content-type': 'application/json'
         }
+      }).catch(function (error){
+        alert(error.response.data)
       }).then(function () { // This line posts the form data
         vue_app.refresh_cards();
         form.reset();
@@ -76,6 +94,8 @@ window.app = new Vue({
           params: {
             id: card_id
           }
+        }).catch(function (error){
+          alert(error.response.data)
         }).then(function () {
           for (let i = 0; i < vue_app.cards.length; i += 1) {
             if (vue_app.cards[i].id === card_id) {
@@ -131,10 +151,12 @@ window.app = new Vue({
       this.edit_card = this.get_card(card_id);
 
       let vue_app = this;
+      this.tempType = this.edit_card.type;
 
       Vue.nextTick(function () {
         vue_app.$refs.card_edit_input.value = vue_app.edit_card.content;
         vue_app.$refs.card_edit_status.value = vue_app.edit_card.status;
+        vue_app.$refs.card_edit_type.value = vue_app.edit_card.type;
         vue_app.$refs.card_edit_assigned.value = vue_app.edit_card.user_id;
       });
     },
@@ -148,6 +170,8 @@ window.app = new Vue({
         headers: {
           'content-type': 'application/json'
         }
+      }).catch(function (error) {
+        alert(error.response.data)
       }).then(function () {
         vue_app.refresh_cards();
       });
@@ -156,7 +180,7 @@ window.app = new Vue({
       this.get_card(card_id).color = ev.target.value;
       this.update_card(card_id);
     },
-    get_all_users: function () {
+    get_all_users_by_project_id: function () {
       let vue_app = this;
       let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
 
@@ -164,8 +188,10 @@ window.app = new Vue({
         params: {
           projectId: loginUser.project_id
         }
+      }).catch(function (error){
+        alert(error.response.data)
       }).then(function (response) {
-        vue_app.allUsers = response.data; // I have to change this to speak to the backend api
+        vue_app.allUsers = response.data;
       });
     },
     get_assigned_user: function (email) {
@@ -175,10 +201,32 @@ window.app = new Vue({
         return email;
       }
     },
+    get_projectName: function () {
+      let vue_app = this;
+      let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
+      axios.get(BACKEND_HOST_URL.concat("/project"), { 
+        params: {
+          user_id: loginUser.project_id
+        }
+      }, {
+        headers: {
+          'content-type': 'application/json'
+        }
+      }).catch(function (error){
+        alert(error.response.data)
+      }).then(function (response) {
+        this.project_name = response.data.project_name; 
+      });
+    },
+    get_current_time: function (dateTime) {
+      let date = new Date(dateTime);
+      return date.toLocaleString();
+    },
     init: function () {
       this.refresh_columns();
       this.refresh_cards();
-      // this.get_all_users();
+      this.get_all_users_by_project_id();
+      this.get_projectName();
       this.$refs.new_card_color.value = getComputedStyle(document.documentElement).getPropertyValue("--default-card-color").replace(/ /g, "");
     }
   }

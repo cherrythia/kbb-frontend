@@ -5,6 +5,7 @@ from flask import Flask, request, redirect, url_for, send_from_directory, sessio
 from flask.json import jsonify
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 def setup_app():
     """Create a new instance of the flask app"""
@@ -25,3 +26,4 @@ def success():
 
 if __name__=='__main__':
     app.run(host="localhost",port=8080, debug = True)
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0

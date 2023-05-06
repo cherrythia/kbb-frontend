@@ -5,19 +5,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <title>NUS KBB Login Page</title>
   <link rel="stylesheet" href="/static/login-page.css">
-  
+
 </head>
 
 <body>
   <div id="main-holder">
-    
+
     <img src="/static/logo.jpg" alt="NUS-ISS Logo">
     <h1 id="login-header">NUS KBB Login Page</h1>
-    
-    
+
+
     <div id="test-msg-holder">
       <p id="test-msg">[For testing purpose, the default username and pw is admin]</p>
     </div>
@@ -27,35 +27,66 @@
       <br>
       <input type="password" name="password" id="password-field" class="login-form-field" placeholder="password">
       <input type="button" onclick="authenticate(this.form)" value="Login" id="login-form-submit">
+      <input type="button" onclick="signup(this.form)" value="Signup" id="signup-form-submit">
     </form>
   </div>
   <script src="static/axios.min.js"></script>
   <script type="module" src="static/config.js"></script>
-  <script> 
-    function authenticate(form)
-    {
+  <script>
+    function authenticate(form) {
       let input_name = form.username.value;
-      let input_pw =form.password.value;
+      let input_pw = form.password.value;
       let result = null;
 
       axios.get(BACKEND_HOST_URL.concat("/user"), {
         params: {
           userEmail: input_name
         }
+      }).catch(function (error) {
+        alert(error.response.data)
       }).then((response) => {
-        result=response.data;
+        result = response.data;
+        if (result == null) {
+          alert("user does not exist, please sign up")
+        }
         if (result.user_password == input_pw) {
           location.href = "main"
           sessionStorage.setItem("loginUser", JSON.stringify(result));
         }
-        else 
-        {
+        else {
           alert("Wrong username or pw submitted!");
         }
       }, (error) => {
         console.log(error);
       });
     };
+
+    function signup(form) {
+      let input_name = form.username.value;
+      let input_pw = form.password.value;
+
+      axios.post(BACKEND_HOST_URL.concat("/user"), {
+        "user_email": input_name,
+        "user_password": input_pw,
+      }, {
+        headers: {
+          'content-type': 'application/json'
+        }
+      }).catch(function (error) {
+        alert(error.response.data)
+      }).then((response) => {
+        result = response.data;
+        if (result.user_email != null) {
+          location.href = "main"
+          sessionStorage.setItem("loginUser", JSON.stringify(result));
+        }
+        else {
+          alert(result);
+        }
+      }, (error) => {
+        console.log(error);
+      })
+    }
   </script>
 </body>
 

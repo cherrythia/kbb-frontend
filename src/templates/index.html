@@ -4,7 +4,7 @@
 <head>
   <title>Kanban board</title>
   <meta charset="utf-8" />
-  
+
   <style>
     :root {
       --kanban-columns: 3;
@@ -243,105 +243,154 @@
       padding: 2rem 2rem;*/
       text-align: left;
     }
-    
+
     .child {
       display: inline-block;
       /* border: 1px solid red; */
       padding: 0.2rem 0.2rem;
       vertical-align: left;
     }
-
-
   </style>
 
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
 </head>
 
 <script>
 
   function checkProject() {
-    let projectNotExist=true // hard code for testing first
+    let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
 
-    //axios.get("project/get_projects").then(function (response) {
-      //console.log(response.data);
-      //projectlist = response.data;
-      //}
-
-    // implement logic to check if user is tagged to any project
-
-    if (Boolean(projectNotExist)) {
-      showProjectModal();
-    }
+    axios.get(BACKEND_HOST_URL.concat("/user"), {
+      params: {
+        "userEmail": loginUser.user_email
+      }
+    }).then(function (response) {
+      user = response.data;
+      console.log(user)
+      if (Boolean(user.project_id == null)) {
+        showProjectModal();
+      }
+    })
   }
 
-  function showProjectModal(){
+  function showProjectModal() {
     $("#myModal").modal('show');
   }
-  </script>
+
+  function hideProjectModal() {
+    $("#myModal").modal('hide');
+  }
+
+  function create_project(form) {
+    console.log('create project')
+    // todo... bug when create project did not update user side 
+    let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
+
+    axios.post(BACKEND_HOST_URL.concat("/project"), {
+      "project_name": form.project_name.value,
+      "content": form.description.value,
+    }, {
+      headers: {
+        'content-type': 'application/json'
+      },
+      params: {
+        user_email: loginUser.user_email
+      }
+    }).catch(function (error) {
+      alert(error.response.data)
+    }).then(function (response) { // This line posts the form data
+      let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
+      loginUser.project_id = response.data.id
+      sessionStorage.setItem("loginUser", JSON.stringify(loginUser))
+      hideProjectModal()
+    });
+  }
+</script>
 
 <div id="myModal" class="modal fade">
   <div class="modal-dialog">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title">Create or join a project</h5>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-          <div class="modal-body">
-              <form v-on:submit.prevent="create_project" action="project/create_project" method="POST">
-                  <div class="form-group">
-                      <input type="text" name="project_name" class="form-control" placeholder="Project Name">
-                  </div>
-                  <div class="form-group">
-                      <input type="text" name="description" class="form-control" placeholder="Description">
-                  </div>
-                  <button type="submit" class="btn btn-primary">Create</button>
-                  <br>
-                  <br>
-                  <div>
-                    <button id="generate" type="button" class="btn btn-primary">Join Project</button>
-                  </div>
-                  <div id="container"></div>
-              </form>
-          </div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create or join a project</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <input type="text" name="project_name" class="form-control" placeholder="Project Name">
+          </div>
+          <div class="form-group">
+            <input type="text" name="description" class="form-control" placeholder="Description">
+          </div>
+          <input type="button" onclick="create_project(this.form)" class="btn btn-primary"
+            value="Create Project"></input>
+          <br>
+          <br>
+          <div>
+            <button id="generate" type="button" class="btn btn-primary">Join Project</button>
+          </div>
+          <div id="container"></div>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- script for dynamic dropdown menu for 'Join project' button -->
 <script>
-  document.getElementById('generate').onclick = function() {
-   
-      var values = ["Project1", "Project2", "Project3"];
-   
+  document.getElementById('generate').onclick = function () {
+    value = axios.get(BACKEND_HOST_URL.concat("/project/all_names")).then(function (response) {
+      values = [""]
+      values = values.concat(response.data)
+      console.log(values)
       var select = document.createElement("select");
       select.name = "projects";
       select.id = "projects"
-   
-      for (const val of values)
-      {
-          var option = document.createElement("option");
-          option.value = val;
-          option.text = val.charAt(0).toUpperCase() + val.slice(1);
-          select.appendChild(option);
+
+      var join = document.createElement("BUTTON")
+      join.innerHTML = "join now"
+      join.id = "join_now"
+
+      for (const val of values) {
+        var option = document.createElement("option");
+        option.value = val;
+        option.text = val;
+        select.appendChild(option);
       }
-   
+
       var label = document.createElement("label");
       label.innerHTML = "Choose your project: "
       label.htmlFor = "projects";
-   
-      document.getElementById("container").appendChild(label).appendChild(select);
+
+      document.getElementById("container").appendChild(label).appendChild(select)
+      document.getElementById("container").appendChild(join);
+      document.getElementById(join.id).onclick = function () {
+        user = JSON.parse(sessionStorage.getItem("loginUser"))
+        let selectedValue = document.getElementById(select.id).value;
+        console.log(selectedValue);
+        axios.post(BACKEND_HOST_URL.concat("/project/join_project"), {
+          "user_email": user.user_email,
+          "project_name": selectedValue
+        }, {
+          headers: {
+            'content-type': 'application/json'
+          }
+        }).catch(function (error) {
+          alert(error)
+        }).then(function (response) {
+          hideProjectModal()
+          sessionStorage.setItem("loginUser", JSON.stringify(response.data))
+        }
+        )
+      }
+    })
   }
 
-  document.getElementById('select').onclick = function() {
-    let x=document.getElementById('select').value;
-    console.log(x);
-    location.assign("https://www.w3schools.com");
-  }
 
-  </script>
+</script>
 
 
 <body onpageshow="checkProject()">
@@ -368,11 +417,11 @@
       </div>
 
       <div class='child'>
-        
+
         <!-- delete project button  -->
-          <form id="delete-project-form" action="project/delete_project" method="POST">
-            <input type="submit" value="Delete Project" id="delete-project-submit">
-          </form>
+        <form id="delete-project-form" action="project/delete_project" method="POST">
+          <input type="submit" value="Delete Project" id="delete-project-submit">
+        </form>
       </div>
     </div>
 
@@ -405,20 +454,20 @@
         v-if="edit_card !== null" v-on:click="handle_card_edit_click">
         <div id="card_edit">
           <form v-on:submit.prevent="complete_card_edit(edit_card.id, $event)" action="#" method="PUT">
-            <label class="color-label">Assigned: 
-              <select id="assigneduser" name="assigneduser"  v-bind:value="edit_card.user_id" ref="card_edit_assigned">
-                <option  v-for="user in allUsers" :value="user.id">{{ get_assigned_user(user.user_email) }}</option>
+            <label class="color-label">Assigned:
+              <select id="assigneduser" name="assigneduser" v-bind:value="edit_card.user_id" ref="card_edit_assigned">
+                <option v-for="user in allUsers" :value="user.id">{{ get_assigned_user(user.user_email) }}</option>
               </select>
-            <br />
-            <label class="color-label">Status: 
-              </select>
-              <select id="status" name="status" v-bind:value="edit_card.status" ref="card_edit_status">
-                <option  v-for="status in columns" :value="status">{{ status }}</option>
-              </select>
-            <br />
-            <textarea v-on:keyup.ctrl.Enter="complete_card_edit(edit_card.id, $event)"
-              ref="card_edit_input">{{edit_card.content}}</textarea>
-            <input class="save-card" type="submit" value="save" />
+              <br />
+              <label class="color-label">Status:
+                </select>
+                <select id="status" name="status" v-bind:value="edit_card.status" ref="card_edit_status">
+                  <option v-for="status in columns" :value="status">{{ status }}</option>
+                </select>
+                <br />
+                <textarea v-on:keyup.ctrl.Enter="complete_card_edit(edit_card.id, $event)"
+                  ref="card_edit_input">{{edit_card.content}}</textarea>
+                <input class="save-card" type="submit" value="save" />
           </form>
           <button class="delete-card" v-on:click.once="delete_card(edit_card.id, $event)">delete card</button>
         </div>

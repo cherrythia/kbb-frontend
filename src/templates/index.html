@@ -290,9 +290,6 @@
     let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
 
     axios.post(BACKEND_HOST_URL.concat("/project"), {
-      // params: {
-      //   "user_email": sessionStorage.getItem("loginUser").user_email
-      // },
       "project_name": form.project_name.value,
       "content": form.description.value,
     }, {
@@ -304,7 +301,10 @@
       }
     }).catch(function (error) {
       alert(error.response.data)
-    }).then(function () { // This line posts the form data
+    }).then(function (response) { // This line posts the form data
+      let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
+      loginUser.project_id = response.data.id
+      sessionStorage.setItem("loginUser", JSON.stringify(loginUser))
       hideProjectModal()
     });
   }

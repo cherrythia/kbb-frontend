@@ -47,8 +47,13 @@
         params: {
           userEmail: input_name
         }
+      }).catch(function (error) {
+        alert(error.response.data)
       }).then((response) => {
         result = response.data;
+        if (result == null) {
+          alert("user does not exist, please sign up")
+        }
         if (result.user_password == input_pw) {
           location.href = "main"
           sessionStorage.setItem("loginUser", JSON.stringify(result));

@@ -19,6 +19,7 @@ window.app = new Vue({
     show_card_ids: false,
     show_card_timestamps: false,
     allUsers: [],
+    user: null,
   },
 
   el: "#kanban",
@@ -35,14 +36,27 @@ window.app = new Vue({
         this.edit_card = null;
       }
     },
+    get_user_details: function (user_email) {
+      axios.get(BACKEND_HOST_URL.concat("/user"), {
+        params: {
+          userEmail: input_name
+        }
+      }).then((response) => {
+        user = response.data
+      }, (error) => {
+        console.log(error);
+      });
+    },
     create_card: function (ev) { // Create card function
       let vue_app = this;
       let form = ev.target;
       let form_color = form.color.value;
 
+      let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
+
       axios.post(BACKEND_HOST_URL.concat("/task/create_task"), {
-        user_id: 1,
-        project_id: 1,
+        user_id: loginUser.id,
+        project_id: loginUser.project_id,
         content: form.text.value,
       }, {
         headers: {
@@ -71,7 +85,7 @@ window.app = new Vue({
             }
           }
         });
-      }          
+      }
     },
     get_card: function (id) { // Get cards, read array only
       let target = id;
@@ -92,8 +106,13 @@ window.app = new Vue({
     },
     refresh_cards: function () { // Add cards, grabs the cards data then store it in response.data and then insert into vue_app.cards
       let vue_app = this;
+      let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
 
-      axios.get(BACKEND_HOST_URL.concat("/task/get_all_task")).then(function (response) {
+      axios.get(BACKEND_HOST_URL.concat("/task/get_task"), {
+        params: {
+          project_id: loginUser.project_id
+        }
+      }).then(function (response) {
         vue_app.cards = response.data; // I have to change this to speak to the backend api
       });
     },
@@ -124,7 +143,7 @@ window.app = new Vue({
       let edit_card = this.edit_card;
       if (edit_card === null) {
         edit_card = this.get_card(id);
-      } 
+      }
       axios.post(BACKEND_HOST_URL.concat("/task/update_task"), edit_card, {
         headers: {
           'content-type': 'application/json'
@@ -139,8 +158,13 @@ window.app = new Vue({
     },
     get_all_users: function () {
       let vue_app = this;
+      let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
 
-      axios.get(BACKEND_HOST_URL.concat("/user")).then(function (response) {
+      axios.get(BACKEND_HOST_URL.concat("/user/get_user_by_project_id"), {
+        params: {
+          projectId: loginUser.project_id
+        }
+      }).then(function (response) {
         vue_app.allUsers = response.data; // I have to change this to speak to the backend api
       });
     },
@@ -154,7 +178,7 @@ window.app = new Vue({
     init: function () {
       this.refresh_columns();
       this.refresh_cards();
-      this.get_all_users();
+      // this.get_all_users();
       this.$refs.new_card_color.value = getComputedStyle(document.documentElement).getPropertyValue("--default-card-color").replace(/ /g, "");
     }
   }
@@ -258,27 +282,27 @@ function drop_handler(ev) {
 }
 
 // Create project function
-function create_project(ev) {
-  let vue_app = this;
-  let form = ev.target;
-  console.log('create project')
-  axios.post(BACKEND_HOST_URL.concat("/project/create_project"), {
+// function create_project(ev) {
+//   let vue_app = this;
+//   let form = ev.target;
+//   console.log('create project')
+//   axios.post(BACKEND_HOST_URL.concat("/project/create_project"), {
 
-    name: form.project_name.value,
-    content: form.description.value,
-  },
+//     name: form.project_name.value,
+//     content: form.description.value,
+//   },
 
-    {
-      headers: {
-        'content-type': 'application/json'
-      }
-    }).then(function () { // This line posts the form data
+//     {
+//       headers: {
+//         'content-type': 'application/json'
+//       }
+//     }).then(function () { // This line posts the form data
 
-      vue_app.refresh_cards();
-      form.reset();
-      vue_app.$refs.new_card_color.value = form_color;
-    });
-}
+//       vue_app.refresh_cards();
+//       form.reset();
+//       vue_app.$refs.new_card_color.value = form_color;
+//     });
+// }
 
 document.addEventListener("DOMContentLoaded", function () {
   window.app.init();

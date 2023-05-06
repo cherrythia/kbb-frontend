@@ -5,36 +5,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <title>NUS KBB Login Page</title>
   <link rel="stylesheet" href="/static/login-page.css">
-  
+
 </head>
 
 <body>
-  <main id="main-holder">
-    
+  <div id="main-holder">
+
     <img src="/static/logo.jpg" alt="NUS-ISS Logo">
     <h1 id="login-header">NUS KBB Login Page</h1>
-    
-    <div id="login-error-msg-holder" style="--opacityvalue: {{ovalue}};">
-      <p id="login-error-msg">Invalid username <span id="error-msg-second-line">and/or password</span></p>
-    </div>
-    
+
+
     <div id="test-msg-holder">
       <p id="test-msg">[For testing purpose, the default username and pw is admin]</p>
     </div>
 
-    <form id="login-form" action="/main" method="post">
-      <input type="text" name="username" id="username-field" class="login-form-field" placeholder="Username">
-      <input type="password" name="password" id="password-field" class="login-form-field" placeholder="Password">
-      <input type="submit" value="Login" id="login-form-submit">
+    <form id="loginForm" action="">
+      <input type="text" name="username" id="username-field" class="login-form-field" placeholder="username">
+      <br>
+      <input type="password" name="password" id="password-field" class="login-form-field" placeholder="password">
+      <input type="button" onclick="authenticate(this.form)" value="Login" id="login-form-submit">
+      <input type="button" onclick="signup(this.form)" value="Signup" id="signup-form-submit">
     </form>
-  
-  </main>
-</body>
+  </div>
+  <script src="static/axios.min.js"></script>
+  <script type="module" src="static/config.js"></script>
+  <script>
+    function authenticate(form) {
+      let input_name = form.username.value;
+      let input_pw = form.password.value;
+      let result = null;
 
-<h2>{{ message }}</h2>
+      if (input_name == "" || input_pw == "admin") {
+        location.href = "main"
+        return;
+      }
+
+      axios.get(BACKEND_HOST_URL.concat("/user"), {
+        params: {
+          userEmail: input_name
+        }
+      }).catch(function (error) {
+        alert(error.response.data)
+      }).then((response) => {
+        result = response.data;
+        if (result == null) {
+          alert("user does not exist, please sign up")
+        }
+        if (result.user_password == input_pw) {
+          location.href = "main"
+          sessionStorage.setItem("loginUser", JSON.stringify(result));
+        }
+        else {
+          alert("Wrong username or pw submitted!");
+        }
+      }, (error) => {
+        console.log(error);
+      });
+    };
+
+    function signup(form) {
+      let input_name = form.username.value;
+      let input_pw = form.password.value;
+
+      axios.post(BACKEND_HOST_URL.concat("/user"), {
+        "user_email": input_name,
+        "user_password": input_pw,
+      }, {
+        headers: {
+          'content-type': 'application/json'
+        }
+      }).catch(function (error) {
+        alert(error.response.data)
+      }).then((response) => {
+        result = response.data;
+        if (result.user_email != null) {
+          location.href = "main"
+          sessionStorage.setItem("loginUser", JSON.stringify(result));
+        }
+        else {
+          alert(result);
+        }
+      }, (error) => {
+        console.log(error);
+      })
+    }
+  </script>
+</body>
 
 
 </html>

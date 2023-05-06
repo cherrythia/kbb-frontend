@@ -7,3 +7,4 @@ __pycache__/cards.cpython-39.pyc
 .gitignore
 .gitignore
 myenv/
+*__pycache__

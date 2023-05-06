@@ -1,9 +1,11 @@
 #### App.py code
 
-from flask import Flask, flash, render_template, Response, request, redirect, url_for, send_from_directory
+from flask import Flask, request, redirect, url_for, send_from_directory, session
 from flask.json import jsonify
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
+
+pw="default"
 
 def setup_app():
     """Create a new instance of the flask app"""
@@ -20,23 +22,35 @@ app = setup_app() # pylint: disable=invalid-name
 def index():
     return send_from_directory('templates', 'login-page.html')
 
-# test comment
-@app.route("/main", methods=["POST"])
-def success():    
-    
-    #placeholder block for handling the HTTP POST request after form submission 
-    name = request.form.get('username')    
-    pw = request.form.get('password')     
-    # print(name) - for debugging
-    # print(pw) - for debugging
+@app.route("/main", methods=["POST", "GET"])
+def success():
+    return send_from_directory('templates', 'index.html')
 
-    # placeholder logic to implement authentication checks later
-    if (pw == "admin"):
-        # return render_template('index-placeholder.html')
-        return send_from_directory('templates', 'index.html')
-    else:
-        return send_from_directory('templates', 'login-page.html', ovalue=1.0, message="Login error: wrong username and/or password")
-         #render the login page again with error message
+# for internal testing only; logic for auth check
+@app.route("/auth", methods=["POST"])
+def check_input():   
+    username = request.form.get('username')    
+    
+    pw = request.form.get('password')
+    
+    return redirect(url_for('user', name = username))
+
+# for internal testing only; logic for auth check
+@app.route('/user/<name>')
+def user_name(name):
+    retrieved_pw = request.args.get('user_password')
+    #retrieved_pw = "default"
+
+    if (pw==retrieved_pw):
+        return f'Successful login for {name}'
+    else: 
+        return f'Wrong inputs'
+
+# for internal testing only; logic for auth check
+@app.route('/user', methods=["POST"])
+def user():
+    return [{'result':'true'}]
+
 
 if __name__=='__main__':
-    app.run(host="localhost",port=3000, debug = True)
+    app.run(host="localhost",port=8080, debug = True)

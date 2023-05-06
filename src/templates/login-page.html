@@ -38,11 +38,6 @@
       let input_pw = form.password.value;
       let result = null;
 
-      if (input_name == "" || input_pw == "admin") {
-        location.href = "main"
-        return;
-      }
-
       axios.get(BACKEND_HOST_URL.concat("/user"), {
         params: {
           userEmail: input_name

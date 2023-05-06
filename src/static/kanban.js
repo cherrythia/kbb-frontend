@@ -225,8 +225,11 @@ window.app = new Vue({
     init: function () {
       this.refresh_columns();
       this.refresh_cards();
-      this.get_all_users_by_project_id();
-      this.get_projectName();
+      this.loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
+      if (this.loginUser.project_id) {
+        this.get_all_users_by_project_id();
+        this.get_projectName();
+      }
       this.$refs.new_card_color.value = getComputedStyle(document.documentElement).getPropertyValue("--default-card-color").replace(/ /g, "");
     }
   }

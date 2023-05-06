@@ -156,7 +156,7 @@ window.app = new Vue({
       this.get_card(card_id).color = ev.target.value;
       this.update_card(card_id);
     },
-    get_all_users: function () {
+    get_all_users_by_project_id: function () {
       let vue_app = this;
       let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
 
@@ -178,7 +178,7 @@ window.app = new Vue({
     init: function () {
       this.refresh_columns();
       this.refresh_cards();
-      // this.get_all_users();
+      this.get_all_users_by_project_id();
       this.$refs.new_card_color.value = getComputedStyle(document.documentElement).getPropertyValue("--default-card-color").replace(/ /g, "");
     }
   }

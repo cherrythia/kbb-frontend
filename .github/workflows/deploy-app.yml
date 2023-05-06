@@ -54,7 +54,7 @@ jobs:
     
     - name: Update env variable in config.js
       run: |
-        sed -i "s|http://localhost:3001|${{ vars.BACKENDURL }}|g" $CONFIG_FILE
+        sed -i "s|http://localhost:3000|${{ vars.BACKENDURL }}|g" $CONFIG_FILE
         cat $CONFIG_FILE
 
     - name: Configure AWS credentials

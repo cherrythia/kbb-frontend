@@ -22,7 +22,7 @@ window.app = new Vue({
     tempType: null,
     user: null,
     card_types: ["task", "bug", "story"],
-    project_name : null
+    project_name: null
   },
 
   el: "#kanban",
@@ -77,7 +77,7 @@ window.app = new Vue({
         headers: {
           'content-type': 'application/json'
         }
-      }).catch(function (error){
+      }).catch(function (error) {
         alert(error.response.data)
       }).then(function () { // This line posts the form data
         vue_app.refresh_cards();
@@ -92,7 +92,7 @@ window.app = new Vue({
           params: {
             id: card_id
           }
-        }).catch(function (error){
+        }).catch(function (error) {
           alert(error.response.data)
         }).then(function () {
           for (let i = 0; i < vue_app.cards.length; i += 1) {
@@ -123,6 +123,7 @@ window.app = new Vue({
       }
     },
     refresh_cards: function () { // Add cards, grabs the cards data then store it in response.data and then insert into vue_app.cards
+      console.log("card refreshed")
       let vue_app = this;
       let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
 
@@ -130,6 +131,8 @@ window.app = new Vue({
         params: {
           project_id: loginUser.project_id
         }
+      }).catch(function (error) {
+        alert(error)
       }).then(function (response) {
         vue_app.cards = response.data; // I have to change this to speak to the backend api
       });
@@ -186,7 +189,7 @@ window.app = new Vue({
         params: {
           projectId: loginUser.project_id
         }
-      }).catch(function (error){
+      }).catch(function (error) {
         alert(error.response.data)
       }).then(function (response) {
         vue_app.allUsers = response.data;
@@ -202,7 +205,7 @@ window.app = new Vue({
     get_projectName: function () {
       let vue_app = this;
       let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
-      axios.get(BACKEND_HOST_URL.concat("/project"), { 
+      axios.get(BACKEND_HOST_URL.concat("/project"), {
         params: {
           user_id: loginUser.project_id
         }
@@ -210,10 +213,10 @@ window.app = new Vue({
         headers: {
           'content-type': 'application/json'
         }
-      }).catch(function (error){
+      }).catch(function (error) {
         alert(error.response.data)
       }).then(function (response) {
-        vue_app.project_name = response.data.project_name; 
+        vue_app.project_name = response.data.project_name;
       });
     },
     get_current_time: function (dateTime) {
@@ -222,12 +225,12 @@ window.app = new Vue({
     },
     init: function () {
       this.refresh_columns();
-      this.refresh_cards();
       this.loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
       if (this.loginUser.project_id) {
         this.get_all_users_by_project_id();
         this.get_projectName();
       }
+      this.refresh_cards();
     }
   }
 });

@@ -272,8 +272,9 @@
       console.log(user)
       if (Boolean(user.project_id == null)) {
         showProjectModal();
-      } else {
+      } else if (loginUser.project_id != user.project_id) {
         sessionStorage.setItem("loginUser", JSON.stringify(user))
+        location.reload()
       }
     })
   }

@@ -403,7 +403,6 @@
       <form v-on:submit.prevent="create_card">
         <input title="create card" src="static/plus_icon.svg" type="image" value="Create card" />
         <label>text: <input name="text" type="text" required="required" /></label>
-        <label>colour: <input ref="new_card_color" title="Select colour" name="color" type="color" /></label>
       </form>
     </header>
 
@@ -415,14 +414,13 @@
           <input type="submit" value="Logout" id="logout-form-submit">
         </form>
       </div>
-
       <div class='child'>
-
         <!-- delete project button  -->
         <form id="delete-project-form" action="project/delete_project" method="POST">
           <input type="submit" value="Delete Project" id="delete-project-submit">
         </form>
       </div>
+      <label v-if="project_name">Project Name: {{project_name}}</label>
     </div>
 
     <!-- display columns -->
@@ -444,7 +442,6 @@
               <p class="card-text">Assigned {{ get_assigned_user(user.user_email) }}</p>
             </template>
             <p class="card-text">Type: {{ card.type }}</p>
-            <p class="card-text">Project {{ card.project_id }}</p>
             <p class="card-text">{{ card.content }}</p>
             <p class="card-last-updated"><small v-show="show_card_timestamps"> Created {{ get_current_time(card.created_on) }} day(s) ago</small></p>
           </li>
@@ -487,19 +484,8 @@
         </div>
       </div>
     </div>
-    <div id="kanban-options">
-      <label>show archived cards: <input type="checkbox" v-model="show_archived_cards" /></label>
-      <label>show card IDs: <input type="checkbox" v-model="show_card_ids" /></label>
-      <label>show last updated: <input type="checkbox" v-model="show_card_timestamps" /></label>
-      <button v-on:click="refresh_cards">refresh data</button>
-    </div>
   </div>
   <footer class="footer">
-    <hr>
-    <small>
-      The source code for this site is available on <a
-        href="https://github.com/FloatingOctothorpe/python-kanban">GitHub</a>.
-    </small>
   </footer>
   <script src="static/vue.min.js"></script>
   <script src="static/axios.min.js"></script>

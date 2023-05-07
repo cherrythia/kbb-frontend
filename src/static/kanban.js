@@ -65,7 +65,6 @@ window.app = new Vue({
     create_card: function (ev) { // Create card function
       let vue_app = this;
       let form = ev.target;
-      let form_color = form.color.value;
 
       let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
 
@@ -83,7 +82,6 @@ window.app = new Vue({
       }).then(function () { // This line posts the form data
         vue_app.refresh_cards();
         form.reset();
-        vue_app.$refs.new_card_color.value = form_color;
       });
     },
     delete_card: function (card_id) {
@@ -215,7 +213,7 @@ window.app = new Vue({
       }).catch(function (error){
         alert(error.response.data)
       }).then(function (response) {
-        this.project_name = response.data.project_name; 
+        vue_app.project_name = response.data.project_name; 
       });
     },
     get_current_time: function (dateTime) {
@@ -230,7 +228,6 @@ window.app = new Vue({
         this.get_all_users_by_project_id();
         this.get_projectName();
       }
-      this.$refs.new_card_color.value = getComputedStyle(document.documentElement).getPropertyValue("--default-card-color").replace(/ /g, "");
     }
   }
 });

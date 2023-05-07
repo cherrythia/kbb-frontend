@@ -82,7 +82,6 @@ window.app = new Vue({
       }).then(function () { // This line posts the form data
         vue_app.refresh_cards();
         form.reset();
-        // vue_app.$refs.new_card_color.value = form_color;
       });
     },
     delete_card: function (card_id) {

@@ -443,10 +443,10 @@
             <template v-for="user in allUsers" v-if="user.id === card.user_id">
               <p class="card-text">Assigned {{ get_assigned_user(user.user_email) }}</p>
             </template>
+            <p class="card-text">Type: {{ card.type }}</p>
             <p class="card-text">Project {{ card.project_id }}</p>
             <p class="card-text">{{ card.content }}</p>
-            <p class="card-last-updated"><small v-show="show_card_timestamps"> Update {{ Math.floor((Date.now() -
-                Date.parse(card.modified)) / (1000*60*60*24)) }} day(s) ago</small></p>
+            <p class="card-last-updated"><small v-show="show_card_timestamps"> Created {{ get_current_time(card.created_on) }} day(s) ago</small></p>
           </li>
         </transition-group>
       </section>
@@ -458,18 +458,32 @@
               <select id="assigneduser" name="assigneduser" v-bind:value="edit_card.user_id" ref="card_edit_assigned">
                 <option v-for="user in allUsers" :value="user.id">{{ get_assigned_user(user.user_email) }}</option>
               </select>
+            <br />
+            <label class="color-label">Status:
+              </select>
+              <select id="status" name="status" v-bind:value="edit_card.status" ref="card_edit_status">
+                <option v-for="status in columns" :value="status">{{ status }}</option>
+              </select>
+            <br />
+            <label class="color-label">Type:
+              </select>
+              <select id="type" name="type" v-bind:value="edit_card.type" v-model:value="tempType" ref="card_edit_type">
+                <option v-for="type in card_types" :value="type">{{ type }}</option>
+              </select>
+            <br/>
+            <template v-bind:value="edit_card.type" v-if="tempType == 'bug' || tempType == 'story'">
+              <label v-if="tempType == 'bug'">Version:</label>
+              <input v-if="tempType == 'bug'" v-bind:value="edit_card.version" ref="card_edit_temp" />
+              <label v-if="tempType == 'story'">Story Points:</label>
+              <input v-if="tempType == 'story'" v-bind:value="edit_card.story_points" ref="card_edit_temp" />
               <br />
-              <label class="color-label">Status:
-                </select>
-                <select id="status" name="status" v-bind:value="edit_card.status" ref="card_edit_status">
-                  <option v-for="status in columns" :value="status">{{ status }}</option>
-                </select>
-                <br />
-                <textarea v-on:keyup.ctrl.Enter="complete_card_edit(edit_card.id, $event)"
-                  ref="card_edit_input">{{edit_card.content}}</textarea>
-                <input class="save-card" type="submit" value="save" />
+            </template>
+            <br/>
+            <textarea v-on:keyup.ctrl.Enter="complete_card_edit(edit_card.id, $event)"
+              ref="card_edit_input">{{edit_card.content}}</textarea>
+            <input class="save-card" type="submit" value="save" />
+            <button class="delete-card" v-on:click.once="delete_card(edit_card.id, $event)">delete card</button>
           </form>
-          <button class="delete-card" v-on:click.once="delete_card(edit_card.id, $event)">delete card</button>
         </div>
       </div>
     </div>

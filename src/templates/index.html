@@ -414,14 +414,13 @@
           <input type="submit" value="Logout" id="logout-form-submit">
         </form>
       </div>
-
       <div class='child'>
-
         <!-- delete project button  -->
         <form id="delete-project-form" action="project/delete_project" method="POST">
           <input type="submit" value="Delete Project" id="delete-project-submit">
         </form>
       </div>
+      <label v-if="project_name">Project Name: {{project_name}}</label>
     </div>
 
     <!-- display columns -->
@@ -443,7 +442,6 @@
               <p class="card-text">Assigned {{ get_assigned_user(user.user_email) }}</p>
             </template>
             <p class="card-text">Type: {{ card.type }}</p>
-            <p class="card-text">Project {{ card.project_id }}</p>
             <p class="card-text">{{ card.content }}</p>
             <p class="card-last-updated"><small v-show="show_card_timestamps"> Created {{ get_current_time(card.created_on) }} day(s) ago</small></p>
           </li>

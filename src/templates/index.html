@@ -403,7 +403,6 @@
       <form v-on:submit.prevent="create_card">
         <input title="create card" src="static/plus_icon.svg" type="image" value="Create card" />
         <label>text: <input name="text" type="text" required="required" /></label>
-        <label>colour: <input ref="new_card_color" title="Select colour" name="color" type="color" /></label>
       </form>
     </header>
 
@@ -487,19 +486,16 @@
         </div>
       </div>
     </div>
+    <!--
     <div id="kanban-options">
       <label>show archived cards: <input type="checkbox" v-model="show_archived_cards" /></label>
       <label>show card IDs: <input type="checkbox" v-model="show_card_ids" /></label>
       <label>show last updated: <input type="checkbox" v-model="show_card_timestamps" /></label>
       <button v-on:click="refresh_cards">refresh data</button>
     </div>
+    -->
   </div>
   <footer class="footer">
-    <hr>
-    <small>
-      The source code for this site is available on <a
-        href="https://github.com/FloatingOctothorpe/python-kanban">GitHub</a>.
-    </small>
   </footer>
   <script src="static/vue.min.js"></script>
   <script src="static/axios.min.js"></script>

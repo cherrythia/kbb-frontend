@@ -340,46 +340,12 @@ function drop_handler(ev) {
     }
   }
 
-  // todo: prioritising order
-  // if (column_cards.length > 0 && card.id !== before_id) {
-  //   // update card
-  //   axios.post("card/reorder", {
-  //     before: before_id,
-  //     card: card.id
-  //   }).then(function () {
-  //     window.app.refresh_cards();
-  //   });
-  // }
-
   // changing columns
   if (card.column !== new_col) {
     card.status = new_col;
     window.app.update_card(card.id);
   }
 }
-
-// Create project function
-// function create_project(ev) {
-//   let vue_app = this;
-//   let form = ev.target;
-//   console.log('create project')
-//   axios.post(BACKEND_HOST_URL.concat("/project/create_project"), {
-
-//     name: form.project_name.value,
-//     content: form.description.value,
-//   },
-
-//     {
-//       headers: {
-//         'content-type': 'application/json'
-//       }
-//     }).then(function () { // This line posts the form data
-
-//       vue_app.refresh_cards();
-//       form.reset();
-//       vue_app.$refs.new_card_color.value = form_color;
-//     });
-// }
 
 document.addEventListener("DOMContentLoaded", function () {
   window.app.init();

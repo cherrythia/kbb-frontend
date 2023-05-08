@@ -423,7 +423,17 @@
           <input type="submit" value="Delete Project" id="delete-project-submit">
         </form>
       </div>
-      <label v-if="project_name">Project Name: {{project_name}}</label>
+      <label v-if="project_name">Project Name: {{project_name}} Current Role: {{role}}</label>
+      <label>
+        <select id="roles" name="assigneduser" v-bind:value="role" ref="card_edit_assigned"
+          onchange="onRoleChange(this)">
+          <option value="admin"> admin </option>
+          <option value="dev"> dev </option>
+          <option value="qa"> qa </option>
+          <option value="reviewer"> reviewer </option>
+        </select>
+      </label>
+      <button v-if="user"> update role </button>
     </div>
 
     <!-- display columns -->

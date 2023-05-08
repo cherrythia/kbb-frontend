@@ -22,7 +22,8 @@ window.app = new Vue({
     tempType: null,
     user: null,
     card_types: ["task", "bug", "story"],
-    project_name: null
+    project_name: null,
+    role: ""
   },
 
   el: "#kanban",
@@ -126,6 +127,10 @@ window.app = new Vue({
       console.log("card refreshed")
       let vue_app = this;
       let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
+      vue_app.role = loginUser.role
+      if (vue_app.role == "") {
+        vue_app.role = "unassigned"
+      }
 
       axios.get(BACKEND_HOST_URL.concat("/task/get_task"), {
         params: {
@@ -231,9 +236,30 @@ window.app = new Vue({
         this.get_projectName();
       }
       this.refresh_cards();
+    },
+    update_role: function (role) {
+      this.role = role
     }
   }
 });
+
+function onRoleChange(roleChange) {
+  let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
+  loginUser.role = roleChange.value
+  axios.put(BACKEND_HOST_URL.concat("/user"), loginUser, {
+    headers: {
+      'content-type': 'application/json'
+    }
+  }).catch(function (error) {
+    alert(error.response.data)
+  }).then(function (response) {
+    console.log("role update done: ", response)
+    sessionStorage.setItem("loginUser", JSON.stringify(loginUser))
+    window.app.update_role(roleChange.value)
+    alert("role has been updated")
+  });
+  console.log(roleChange.value)
+}
 
 function dragstart_handler(ev) {
   // Add the target element's id to the data transfer object

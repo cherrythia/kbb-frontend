@@ -13,7 +13,14 @@
 window.app = new Vue({
   data: {
     cards: [], // Ask when will this be populated? Find the logic that helps to populate this...
-    columns: ["waiting", "doing", "done"],
+    columns: ["waiting", "developing", "reviewing", "testing", "done"],
+    rolesMap: new Map([
+      ["waiting", "developer"],
+      ["developing", "developer"],
+      ["reviewing", "reviewer"],
+      ["testing", "qa"],
+      ["done", "developer"]
+    ]),
     edit_card: null,
     show_archived_cards: false,
     show_card_ids: false,
@@ -139,6 +146,16 @@ window.app = new Vue({
       }).catch(function (error) {
         alert(error)
       }).then(function (response) {
+        for (i = 0; i < response.data.length; i++) {
+          console.log(vue_app.role)
+          console.log(response.data[i])
+          console.log(vue_app.rolesMap.get(response.data[i].status))
+          console.log(response.data[i].status)
+          if (vue_app.role == vue_app.rolesMap.get(response.data[i].status)) {
+            response.data[i].isApprover = true
+          }
+        }
+        console.log(response.data)
         vue_app.cards = response.data; // I have to change this to speak to the backend api
       });
     },
@@ -239,6 +256,11 @@ window.app = new Vue({
     },
     update_role: function (role) {
       this.role = role
+    },
+    isApprover: function (col) {
+      console.log(this.rolesMap[col])
+      console.log(this.role)
+      return this.rolesMap[col] == this.role
     }
   }
 });

@@ -171,8 +171,11 @@ window.app = new Vue({
           console.log(response.data[i].status !== "done")
           console.log(vue_app.role == vue_app.rolesMap.get(response.data[i].status) && response.data[i].status != "done")
           console.log(response.data[i].status)
-          if (vue_app.role == vue_app.rolesMap.get(response.data[i].status) && response.data[i].status != "done") {
+          if (vue_app.role == "admin" || vue_app.role == vue_app.rolesMap.get(response.data[i].status) && response.data[i].status != "done") {
             response.data[i].isApprover = true
+          }
+          if (response.data[i].status == "done") {
+            response.data[i].isApprover = false
           }
         }
         console.log(response.data)

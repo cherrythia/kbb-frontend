@@ -154,7 +154,7 @@
       float: right;
     }
 
-    #kanban-card-edit button.approve-card {
+    #kanban-card-edit input.approve-card {
       color: white;
       border: none;
       padding: 0.3em 3em;
@@ -164,12 +164,12 @@
       border: 1px solid grey;
     }
 
-    #kanban-card-edit button.approve-card {
+    #kanban-card-edit input[type="submit"].approve-card {
       background-color: blue;
       float: right;
     }
 
-    #kanban-card-edit input[type="submit"] {
+    #kanban-card-edit input[type="submit"].save-card {
       background-color: green;
       float: left;
     }
@@ -461,12 +461,12 @@
           <li v-bind:id="'card' + card.id" draggable="true" :key="card.id" class="kanban-card"
             v-bind:class="{ archived: card.archived }" ondragstart="dragstart_handler(event);"
             v-bind:style="{'background-color':  card.color}" v-if="card.status === column" v-for="card in cards">
-            <a draggable="false" class="edit-icon" href='#' v-on:click.prevent="start_card_edit(card.id, $event)"
-              title="edit">
+            <a draggable="false" class="edit-icon" href='#'
+              v-on:click.prevent="start_card_edit(card.id, column, $event)" title="edit">
               <img src="static/edit_icon.svg" alt="edit" />
             </a>
             <span class="card_id" v-show="show_card_ids"><small>#{{ card.id }}</small></span>
-            <template v-for="user in allUsers" v-if="user.id === card.user_id">
+            <template v-for="user in cardAssignee" v-if="user.id === card.user_id">
               <p class="card-text">Assigned {{ get_assigned_user(user.user_email) }}</p>
             </template>
             <p class="card-text">Type: {{ card.type }}</p>
@@ -475,47 +475,47 @@
                 get_current_time(card.created_on) }} day(s) ago</small></p>
           </li>
         </transition-group>
-        <div ref="card_edit_container" v-on:keyup.Esc.prevent="cancel_card_edit" id="kanban-card-edit"
-          v-if="edit_card !== null" v-on:click="handle_card_edit_click">
-          <div id="card_edit">
-            <form v-on:submit.prevent="complete_card_edit(edit_card.id, $event)" action="#" method="PUT">
-              <label class="color-label">Assigned:
-                <select id="assigneduser" name="assigneduser" v-bind:value="edit_card.user_id" ref="card_edit_assigned">
-                  <option v-for="user in allUsers" :value="user.id">{{ get_assigned_user(user.user_email) }}</option>
+
+      </section>
+      <div ref="card_edit_container" v-on:keyup.Esc.prevent="cancel_card_edit" id="kanban-card-edit"
+        v-if="edit_card !== null" v-on:click="handle_card_edit_click">
+        <div id="card_edit">
+          <form v-on:submit.prevent="complete_card_edit(edit_card.id, $event)" action="#" method="PUT">
+            <label class="color-label">Assigned:
+              <select id="assigneduser" name="assigneduser" v-bind:value="edit_card.user_id" ref="card_edit_assigned">
+                <option v-for="user in allUsers" :value="user.id">{{ get_assigned_user(user.user_email) }}</option>
+              </select>
+              <br />
+              <label class="color-label">Status:
+                </select>
+                <select id="status" name="status" v-bind:value="edit_card.status" ref="card_edit_status">
+                  <option v-for="status in columns" :value="status">{{ status }}</option>
                 </select>
                 <br />
-                <label class="color-label">Status:
+                <label class="color-label">Type:
                   </select>
-                  <select id="status" name="status" v-bind:value="edit_card.status" ref="card_edit_status">
-                    <option v-for="status in columns" :value="status">{{ status }}</option>
+                  <select id="type" name="type" v-bind:value="edit_card.type" v-model:value="tempType"
+                    ref="card_edit_type">
+                    <option v-for="type in card_types" :value="type">{{ type }}</option>
                   </select>
                   <br />
-                  <label class="color-label">Type:
-                    </select>
-                    <select id="type" name="type" v-bind:value="edit_card.type" v-model:value="tempType"
-                      ref="card_edit_type">
-                      <option v-for="type in card_types" :value="type">{{ type }}</option>
-                    </select>
+                  <template v-bind:value="edit_card.type" v-if="tempType == 'bug' || tempType == 'story'">
+                    <label v-if="tempType == 'bug'">Version:</label>
+                    <input v-if="tempType == 'bug'" v-bind:value="edit_card.version" ref="card_edit_temp" />
+                    <label v-if="tempType == 'story'">Story Points:</label>
+                    <input v-if="tempType == 'story'" v-bind:value="edit_card.story_points" ref="card_edit_temp" />
                     <br />
-                    <template v-bind:value="edit_card.type" v-if="tempType == 'bug' || tempType == 'story'">
-                      <label v-if="tempType == 'bug'">Version:</label>
-                      <input v-if="tempType == 'bug'" v-bind:value="edit_card.version" ref="card_edit_temp" />
-                      <label v-if="tempType == 'story'">Story Points:</label>
-                      <input v-if="tempType == 'story'" v-bind:value="edit_card.story_points" ref="card_edit_temp" />
-                      <br />
-                    </template>
-                    <br />
-                    <textarea v-on:keyup.ctrl.Enter="complete_card_edit(edit_card.id, $event)"
-                      ref="card_edit_input">{{edit_card.content}}</textarea>
-                    <input class="save-card" type="submit" value="save" />
-                    <button class="approve-card" v-if="edit_card.isApprover"> approve</button>
-                    <button class="delete-card" v-on:click.once="delete_card(edit_card.id, $event)">delete card</button>
-            </form>
-          </div>
-      </section>
-
+                  </template>
+                  <br />
+                  <textarea v-on:keyup.ctrl.Enter="complete_card_edit(edit_card.id, $event)"
+                    ref="card_edit_input">{{edit_card.content}}</textarea>
+                  <input class="save-card" type="submit" value="save" />
+                  <input v-if="edit_card.isApprover" class="approve-card" type="submit" value="approve" />
+                  <button class="delete-card" v-on:click.once="delete_card(edit_card.id, $event)">delete card</button>
+          </form>
+        </div>
+      </div>
     </div>
-  </div>
   </div>
   <footer class="footer">
   </footer>

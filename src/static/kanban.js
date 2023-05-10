@@ -26,6 +26,7 @@ window.app = new Vue({
     show_card_ids: false,
     show_card_timestamps: false,
     allUsers: [],
+    cardAssignee: [],
     tempType: null,
     user: null,
     card_types: ["task", "bug", "story"],
@@ -39,10 +40,17 @@ window.app = new Vue({
       this.edit_card = null;
       this.tempType = null;
     },
-    complete_card_edit: function (card_id) {
+    complete_card_edit: function (card_id, ev) {
       if (this.edit_card) {
+        console.log(ev.submitter.value)
         this.edit_card.content = this.$refs.card_edit_input.value;
-        this.edit_card.status = this.$refs.card_edit_status.value;
+
+        if (ev.submitter.value == "approve") {
+          this.edit_card.status = this.get_next_column(this.$refs.card_edit_status.value)
+        } else {
+          this.edit_card.status = this.$refs.card_edit_status.value;
+        }
+
         this.edit_card.type = this.$refs.card_edit_type.value;
         this.edit_card.user_id = this.$refs.card_edit_assigned.value;
         if (this.tempType == 'bug') {
@@ -92,6 +100,16 @@ window.app = new Vue({
         form.reset();
       });
     },
+    get_next_column: function (currentColumn) {
+      let vue_app = this
+      for (i = 0; i < vue_app.columns.length; i++) {
+        if (i == vue_app.columns.length - 1) {
+          return vue_app.columns[i]
+        } else if (vue_app.columns[i] == currentColumn) {
+          return vue_app.columns[i + 1]
+        }
+      }
+    },
     delete_card: function (card_id) {
       let vue_app = this;
 
@@ -125,7 +143,7 @@ window.app = new Vue({
         }
       }
     },
-    handle_card_edit_click: function (ev) {
+    handle_card_edit_click: function (ev, column) {
       if (ev.target === this.$refs.card_edit_container) {
         this.edit_card = null;
       }
@@ -150,8 +168,10 @@ window.app = new Vue({
           console.log(vue_app.role)
           console.log(response.data[i])
           console.log(vue_app.rolesMap.get(response.data[i].status))
+          console.log(response.data[i].status !== "done")
+          console.log(vue_app.role == vue_app.rolesMap.get(response.data[i].status) && response.data[i].status != "done")
           console.log(response.data[i].status)
-          if (vue_app.role == vue_app.rolesMap.get(response.data[i].status)) {
+          if (vue_app.role == vue_app.rolesMap.get(response.data[i].status) && response.data[i].status != "done") {
             response.data[i].isApprover = true
           }
         }
@@ -170,7 +190,7 @@ window.app = new Vue({
       //   );
       // });
     },
-    start_card_edit: function (card_id) {
+    start_card_edit: function (card_id, column) {
       this.edit_card = this.get_card(card_id);
 
       let vue_app = this;
@@ -182,12 +202,36 @@ window.app = new Vue({
         vue_app.$refs.card_edit_type.value = vue_app.edit_card.type;
         vue_app.$refs.card_edit_assigned.value = vue_app.edit_card.user_id;
       });
+
+      let loginUser = JSON.parse(sessionStorage.getItem("loginUser"))
+      axios.get(BACKEND_HOST_URL.concat("/user/get_user_by_project_id"), {
+        params: {
+          projectId: loginUser.project_id,
+          role: column
+        }
+      }).catch(function (error) {
+        alert(error.response.data)
+      }).then(function (response) {
+        vue_app.cardAssignee = response.data
+      });
+
+      // axios.get(BACKEND_HOST_URL.concat("/user/get_user_by_project_id"), {
+      //   parmas: {
+      //     projectId: loginUser.projectId,
+      //     role: column
+      //   }
+      // }).catch(function (error) {
+      //   alert(error)
+      // }).then(function (response) {
+      //   vue_app.cardAssignee = response.data
+      // })
     },
     update_card: function (id) {
       let vue_app = this;
       let edit_card = this.edit_card;
       if (edit_card === null) {
         edit_card = this.get_card(id);
+
       }
       axios.post(BACKEND_HOST_URL.concat("/task/update_task"), edit_card, {
         headers: {
@@ -258,11 +302,6 @@ window.app = new Vue({
       this.role = role
       location.reload()
     },
-    isApprover: function (col) {
-      console.log(this.rolesMap[col])
-      console.log(this.role)
-      return this.rolesMap[col] == this.role
-    }
   }
 });
 

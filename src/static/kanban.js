@@ -15,11 +15,11 @@ window.app = new Vue({
     cards: [], // Ask when will this be populated? Find the logic that helps to populate this...
     columns: ["waiting", "developing", "reviewing", "testing", "done"],
     rolesMap: new Map([
-      ["waiting", "developer"],
-      ["developing", "developer"],
+      ["waiting", "dev"],
+      ["developing", "dev"],
       ["reviewing", "reviewer"],
       ["testing", "qa"],
-      ["done", "developer"]
+      ["done", "dev"]
     ]),
     edit_card: null,
     show_archived_cards: false,
@@ -256,6 +256,7 @@ window.app = new Vue({
     },
     update_role: function (role) {
       this.role = role
+      location.reload()
     },
     isApprover: function (col) {
       console.log(this.rolesMap[col])

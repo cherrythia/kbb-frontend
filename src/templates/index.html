@@ -475,8 +475,9 @@
     <!-- display columns -->
 
     <div id="kanban-cols">
-      <section class="column" v-bind:id="'column' + index" v-for="(column, index) in columns"
-        ondrop="drop_handler(event);" ondragover="dragover_handler(event);" ondragleave="dragleave_handler(event);">
+      <!-- <section class="column" v-bind:id="'column' + index" v-for="(column, index) in columns"
+        ondrop="drop_handler(event);" ondragover="dragover_handler(event);" ondragleave="dragleave_handler(event);"> -->
+      <section class="column" v-bind:id="'column' + index" v-for="(column, index) in columns">
         <h2>{{ column }}</h2>
         <transition-group tag="ol" name="fade">
           <li v-bind:id="'card' + card.id" draggable="true" :key="card.id" class="kanban-card"
@@ -507,11 +508,10 @@
                 <option v-for="user in allUsers" :value="user.id">{{ get_assigned_user(user.user_email) }}</option>
               </select>
               <br />
-              <label class="color-label">Status:
-                </select>
-                <select id="status" name="status" v-bind:value="edit_card.status" ref="card_edit_status">
+              <label class="color-label">Status: {{ edit_card.status }}
+                <!-- <select id="status" name="status" v-bind:value="edit_card.status" ref="card_edit_status">
                   <option v-for="status in columns" :value="status">{{ status }}</option>
-                </select>
+                </select> -->
                 <br />
                 <label class="color-label">Type:
                   </select>

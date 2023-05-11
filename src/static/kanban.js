@@ -13,16 +13,25 @@
 window.app = new Vue({
   data: {
     cards: [], // Ask when will this be populated? Find the logic that helps to populate this...
-    columns: ["waiting", "doing", "done"],
+    columns: ["waiting", "developing", "reviewing", "testing", "done"],
+    rolesMap: new Map([
+      ["waiting", "dev"],
+      ["developing", "dev"],
+      ["reviewing", "reviewer"],
+      ["testing", "qa"],
+      ["done", "dev"]
+    ]),
     edit_card: null,
     show_archived_cards: false,
     show_card_ids: false,
     show_card_timestamps: false,
     allUsers: [],
+    cardAssignee: [],
     tempType: null,
     user: null,
     card_types: ["task", "bug", "story"],
-    project_name: null
+    project_name: null,
+    role: ""
   },
 
   el: "#kanban",
@@ -31,10 +40,17 @@ window.app = new Vue({
       this.edit_card = null;
       this.tempType = null;
     },
-    complete_card_edit: function (card_id) {
+    complete_card_edit: function (card_id, ev) {
       if (this.edit_card) {
+        console.log(ev.submitter.value)
         this.edit_card.content = this.$refs.card_edit_input.value;
-        this.edit_card.status = this.$refs.card_edit_status.value;
+
+        if (ev.submitter.value == "approve") {
+          this.edit_card.status = this.get_next_column(this.$refs.card_edit_status.value)
+        } else {
+          this.edit_card.status = this.$refs.card_edit_status.value;
+        }
+
         this.edit_card.type = this.$refs.card_edit_type.value;
         this.edit_card.user_id = this.$refs.card_edit_assigned.value;
         if (this.tempType == 'bug') {
@@ -84,6 +100,16 @@ window.app = new Vue({
         form.reset();
       });
     },
+    get_next_column: function (currentColumn) {
+      let vue_app = this
+      for (i = 0; i < vue_app.columns.length; i++) {
+        if (i == vue_app.columns.length - 1) {
+          return vue_app.columns[i]
+        } else if (vue_app.columns[i] == currentColumn) {
+          return vue_app.columns[i + 1]
+        }
+      }
+    },
     delete_card: function (card_id) {
       let vue_app = this;
 
@@ -117,7 +143,7 @@ window.app = new Vue({
         }
       }
     },
-    handle_card_edit_click: function (ev) {
+    handle_card_edit_click: function (ev, column) {
       if (ev.target === this.$refs.card_edit_container) {
         this.edit_card = null;
       }
@@ -126,6 +152,10 @@ window.app = new Vue({
       console.log("card refreshed")
       let vue_app = this;
       let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
+      vue_app.role = loginUser.role
+      if (vue_app.role == "") {
+        vue_app.role = "unassigned"
+      }
 
       axios.get(BACKEND_HOST_URL.concat("/task/get_task"), {
         params: {
@@ -134,6 +164,21 @@ window.app = new Vue({
       }).catch(function (error) {
         alert(error)
       }).then(function (response) {
+        for (i = 0; i < response.data.length; i++) {
+          console.log(vue_app.role)
+          console.log(response.data[i])
+          console.log(vue_app.rolesMap.get(response.data[i].status))
+          console.log(response.data[i].status !== "done")
+          console.log(vue_app.role == vue_app.rolesMap.get(response.data[i].status) && response.data[i].status != "done")
+          console.log(response.data[i].status)
+          if (vue_app.role == "admin" || vue_app.role == vue_app.rolesMap.get(response.data[i].status) && response.data[i].status != "done") {
+            response.data[i].isApprover = true
+          }
+          if (response.data[i].status == "done") {
+            response.data[i].isApprover = false
+          }
+        }
+        console.log(response.data)
         vue_app.cards = response.data; // I have to change this to speak to the backend api
       });
     },
@@ -148,7 +193,7 @@ window.app = new Vue({
       //   );
       // });
     },
-    start_card_edit: function (card_id) {
+    start_card_edit: function (card_id, column) {
       this.edit_card = this.get_card(card_id);
 
       let vue_app = this;
@@ -160,12 +205,36 @@ window.app = new Vue({
         vue_app.$refs.card_edit_type.value = vue_app.edit_card.type;
         vue_app.$refs.card_edit_assigned.value = vue_app.edit_card.user_id;
       });
+
+      let loginUser = JSON.parse(sessionStorage.getItem("loginUser"))
+      axios.get(BACKEND_HOST_URL.concat("/user/get_user_by_project_id"), {
+        params: {
+          projectId: loginUser.project_id,
+          role: column
+        }
+      }).catch(function (error) {
+        alert(error.response.data)
+      }).then(function (response) {
+        vue_app.cardAssignee = response.data
+      });
+
+      // axios.get(BACKEND_HOST_URL.concat("/user/get_user_by_project_id"), {
+      //   parmas: {
+      //     projectId: loginUser.projectId,
+      //     role: column
+      //   }
+      // }).catch(function (error) {
+      //   alert(error)
+      // }).then(function (response) {
+      //   vue_app.cardAssignee = response.data
+      // })
     },
     update_card: function (id) {
       let vue_app = this;
       let edit_card = this.edit_card;
       if (edit_card === null) {
         edit_card = this.get_card(id);
+
       }
       axios.post(BACKEND_HOST_URL.concat("/task/update_task"), edit_card, {
         headers: {
@@ -231,9 +300,31 @@ window.app = new Vue({
         this.get_projectName();
       }
       this.refresh_cards();
-    }
+    },
+    update_role: function (role) {
+      this.role = role
+      location.reload()
+    },
   }
 });
+
+function onRoleChange(roleChange) {
+  let loginUser = JSON.parse(sessionStorage.getItem("loginUser"));
+  loginUser.role = roleChange.value
+  axios.put(BACKEND_HOST_URL.concat("/user"), loginUser, {
+    headers: {
+      'content-type': 'application/json'
+    }
+  }).catch(function (error) {
+    alert(error.response.data)
+  }).then(function (response) {
+    console.log("role update done: ", response)
+    sessionStorage.setItem("loginUser", JSON.stringify(loginUser))
+    window.app.update_role(roleChange.value)
+    alert("role has been updated")
+  });
+  console.log(roleChange.value)
+}
 
 function dragstart_handler(ev) {
   // Add the target element's id to the data transfer object
@@ -314,46 +405,12 @@ function drop_handler(ev) {
     }
   }
 
-  // todo: prioritising order
-  // if (column_cards.length > 0 && card.id !== before_id) {
-  //   // update card
-  //   axios.post("card/reorder", {
-  //     before: before_id,
-  //     card: card.id
-  //   }).then(function () {
-  //     window.app.refresh_cards();
-  //   });
-  // }
-
   // changing columns
   if (card.column !== new_col) {
     card.status = new_col;
     window.app.update_card(card.id);
   }
 }
-
-// Create project function
-// function create_project(ev) {
-//   let vue_app = this;
-//   let form = ev.target;
-//   console.log('create project')
-//   axios.post(BACKEND_HOST_URL.concat("/project/create_project"), {
-
-//     name: form.project_name.value,
-//     content: form.description.value,
-//   },
-
-//     {
-//       headers: {
-//         'content-type': 'application/json'
-//       }
-//     }).then(function () { // This line posts the form data
-
-//       vue_app.refresh_cards();
-//       form.reset();
-//       vue_app.$refs.new_card_color.value = form_color;
-//     });
-// }
 
 document.addEventListener("DOMContentLoaded", function () {
   window.app.init();

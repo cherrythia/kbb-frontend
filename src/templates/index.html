@@ -7,7 +7,7 @@
 
   <style>
     :root {
-      --kanban-columns: 3;
+      --kanban-columns: 5;
       --default-card-color: #a2f7a8;
       --light-background: #eaeaeb;
     }
@@ -154,7 +154,22 @@
       float: right;
     }
 
-    #kanban-card-edit input[type="submit"] {
+    #kanban-card-edit input.approve-card {
+      color: white;
+      border: none;
+      padding: 0.3em 3em;
+      border-radius: 5px;
+      margin: 0.7em 0 0 0;
+      width: -webkit-fill-available;
+      border: 1px solid grey;
+    }
+
+    #kanban-card-edit input[type="submit"].approve-card {
+      background-color: blue;
+      float: right;
+    }
+
+    #kanban-card-edit input[type="submit"].save-card {
       background-color: green;
       float: left;
     }
@@ -423,7 +438,17 @@
           <input type="submit" value="Delete Project" id="delete-project-submit">
         </form>
       </div>
-      <label v-if="project_name">Project Name: {{project_name}}</label>
+      <label v-if="project_name">Project Name: {{project_name}} Current Role: {{role}}</label>
+      <label>
+        <select id="roles" name="assigneduser" v-bind:value="role" ref="card_edit_assigned"
+          onchange="onRoleChange(this)">
+          <option value="admin"> admin </option>
+          <option value="dev"> dev </option>
+          <option value="qa"> qa </option>
+          <option value="reviewer"> reviewer </option>
+        </select>
+      </label>
+      <button v-if="user"> update role </button>
     </div>
 
     <!-- display columns -->
@@ -436,12 +461,12 @@
           <li v-bind:id="'card' + card.id" draggable="true" :key="card.id" class="kanban-card"
             v-bind:class="{ archived: card.archived }" ondragstart="dragstart_handler(event);"
             v-bind:style="{'background-color':  card.color}" v-if="card.status === column" v-for="card in cards">
-            <a draggable="false" class="edit-icon" href='#' v-on:click.prevent="start_card_edit(card.id, $event)"
-              title="edit">
+            <a draggable="false" class="edit-icon" href='#'
+              v-on:click.prevent="start_card_edit(card.id, column, $event)" title="edit">
               <img src="static/edit_icon.svg" alt="edit" />
             </a>
             <span class="card_id" v-show="show_card_ids"><small>#{{ card.id }}</small></span>
-            <template v-for="user in allUsers" v-if="user.id === card.user_id">
+            <template v-for="user in cardAssignee" v-if="user.id === card.user_id">
               <p class="card-text">Assigned {{ get_assigned_user(user.user_email) }}</p>
             </template>
             <p class="card-text">Type: {{ card.type }}</p>
@@ -450,6 +475,7 @@
                 get_current_time(card.created_on) }} day(s) ago</small></p>
           </li>
         </transition-group>
+
       </section>
       <div ref="card_edit_container" v-on:keyup.Esc.prevent="cancel_card_edit" id="kanban-card-edit"
         v-if="edit_card !== null" v-on:click="handle_card_edit_click">
@@ -484,6 +510,7 @@
                   <textarea v-on:keyup.ctrl.Enter="complete_card_edit(edit_card.id, $event)"
                     ref="card_edit_input">{{edit_card.content}}</textarea>
                   <input class="save-card" type="submit" value="save" />
+                  <input v-if="edit_card.isApprover" class="approve-card" type="submit" value="approve" />
                   <button class="delete-card" v-on:click.once="delete_card(edit_card.id, $event)">delete card</button>
           </form>
         </div>

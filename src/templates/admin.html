@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NUS KBB Admin Page</title>
+
+</head>
+
+<body onload="loadUserList()">
+    <h1>
+        Role Assignment
+    </h1>
+
+    <form action="main" method="GET">
+        <input type="submit" value="back to kanban" id="kanban-page-submit">
+    </form>
+    <script src="static/axios.min.js"></script>
+    <script type="module" src="static/config.js"></script>
+</body>
+
+<script>
+    function loadUserList() {
+        // get user list 
+        // for each user generate the element
+        const body = document.body,
+            tbl = document.createElement('table');
+        tbl.style.width = '100px';
+        tbl.style.border = '1px solid black';
+        var header = tbl.insertRow();
+        var headerCell1 = header.insertCell();
+        var headerCell2 = header.insertCell();
+        headerCell1.appendChild(document.createTextNode(`User`))
+        headerCell2.appendChild(document.createTextNode(`Role`))
+        headerCell1.style.border = '1px solid black';
+        headerCell2.style.border = '1px solid black';
+
+        var loginUser = JSON.parse(sessionStorage.getItem("loginUser"))
+        var roles = ["unassigned", "dev", "qa", "reviewer"]
+
+        axios.get(BACKEND_HOST_URL.concat("/user/get_user_by_project_id"), {
+            params: {
+                projectId: loginUser.project_id,
+            }
+        }).catch(function (error) {
+            alert(error.response.data)
+        }).then(function (response) {
+            var userList = response.data
+            for (i = 0; i < userList.length; i++) {
+                var user = userList[i]
+                if (user.role == "admin") {
+                    continue
+                }
+                var newUserRow = tbl.insertRow()
+                var headerCell1 = newUserRow.insertCell();
+                var headerCell2 = newUserRow.insertCell();
+
+                var userEmailText = document.createElement("div")
+                const newContent = document.createTextNode(user.user_email);
+                userEmailText.append(newContent)
+                // var userEmailText = document.createElement(user.user_email)
+                userEmailText.id = "roles_" + i + "_user"
+                headerCell1.appendChild(userEmailText)
+
+                var select = document.createElement("select");
+                select.name = "roles";
+                select.id = "roles_" + i
+                for (const val of roles) {
+
+                    var option = document.createElement("option");
+                    option.value = val;
+                    option.text = val;
+                    if (user.role == "" && val == "unassigned") {
+                        option.selected = true
+                    }
+                    if (val == user.role) {
+                        option.selected = true
+                    }
+                    select.appendChild(option);
+                }
+
+                select.onchange = function (ev) {
+                    console.log(ev)
+                    console.log(ev.target.value)
+                    console.log(ev.target.id)
+                    var updateRole = ev.target.value
+                    var userTextId = ev.target.id + "_user"
+                    var userEmail = document.getElementById(userTextId).innerHTML
+                    axios.get(BACKEND_HOST_URL.concat("/user"), {
+                        params: {
+                            userEmail: userEmail
+                        }
+                    }).then((response) => {
+                        user = response.data
+                        user.role = updateRole
+                        axios.put(BACKEND_HOST_URL.concat("/user"), user, {
+                            headers: {
+                                'content-type': 'application/json'
+                            }
+                        }).catch(function (error) {
+                            alert(error.response.data)
+                        }).then(function (response) {
+                            console.log("role update done: ", response)
+                        });
+                        console.log(user);
+
+                    }, (error) => {
+                        console.log(error);
+                    });
+                }
+                headerCell2.appendChild(select)
+                headerCell1.style.border = '1px solid black';
+                headerCell2.style.border = '1px solid black';
+            }
+        });
+        // for (let i = 0; i < 3; i++) {
+        //     const tr = tbl.insertRow();
+        //     for (let j = 0; j < 2; j++) {
+        //         if (i === 2 && j === 1) {
+        //             break;
+        //         } else {
+        //             const td = tr.insertCell();
+        //             td.appendChild(document.createTextNode(`Cell I${i}/J${j}`));
+        //             td.style.border = '1px solid black';
+        //             if (i === 1 && j === 1) {
+        //                 td.setAttribute('rowSpan', '2');
+        //             }
+        //         }
+        //     }
+        // }
+        body.appendChild(tbl);
+    }
+
+
+</script>

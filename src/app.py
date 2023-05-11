@@ -20,9 +20,13 @@ def index():
     return send_from_directory('templates', 'login-page.html')
 
 
-@app.route("/main", methods=["GET"])
+@app.route("/main")
 def success():
     return send_from_directory('templates', 'index.html')
+
+@app.route("/admin")
+def adminPage():
+    return send_from_directory('templates', 'admin.html')
 
 if __name__=='__main__':
     app.run(host="localhost",port=8080, debug = True)

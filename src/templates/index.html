@@ -14,7 +14,7 @@
 
     body {
       font-family: Helvetica;
-      margin: 0
+      margin: 0;
     }
 
     footer {
@@ -229,6 +229,7 @@
     .column {
       background-color: var(--light-background);
       border-radius: 5px;
+      height: 50rem;
     }
 
     #kanban[v-cloak] {
@@ -287,7 +288,7 @@
       console.log(user)
       if (Boolean(user.project_id == null)) {
         showProjectModal();
-      } else if (loginUser.project_id != user.project_id) {
+      } else if (loginUser.project_id != user.project_id || loginUser.role != user.role) {
         sessionStorage.setItem("loginUser", JSON.stringify(user))
         location.reload()
       }
@@ -300,6 +301,7 @@
 
   function hideProjectModal() {
     $("#myModal").modal('hide');
+    location.reload()
   }
 
   function create_project(form) {
@@ -407,7 +409,20 @@
     })
   }
 
+  function updateSessionStorage() {
+    let loginUser = sessionStorage.getItem("loginUser")
+    console.log(loginUser)
 
+    axios.get(BACKEND_HOST_URL.concat("/user"), {
+      params: {
+        userEmail: loginUser.user_email
+      }
+    }).catch(function (error) {
+      alert(error)
+    }).then((response) => {
+      console.log("on refresh: ", response.data)
+    });
+  }
 </script>
 
 
@@ -438,8 +453,14 @@
           <input type="submit" value="Delete Project" id="delete-project-submit">
         </form>
       </div>
+      <div class='child'>
+        <!-- delete project button  -->
+        <form v-if="role == 'admin'" action="admin" method="GET">
+          <input type="submit" value="admin controls" id="admin-page-submit">
+        </form>
+      </div>
       <label v-if="project_name">Project Name: {{project_name}} Current Role: {{role}}</label>
-      <label>
+      <!-- <label>
         <select id="roles" name="assigneduser" v-bind:value="role" ref="card_edit_assigned"
           onchange="onRoleChange(this)">
           <option value="admin"> admin </option>
@@ -447,8 +468,8 @@
           <option value="qa"> qa </option>
           <option value="reviewer"> reviewer </option>
         </select>
-      </label>
-      <button v-if="user"> update role </button>
+      </label> -->
+      <!-- <button v-if="user"> update role </button> -->
     </div>
 
     <!-- display columns -->

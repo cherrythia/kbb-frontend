@@ -508,7 +508,7 @@
                 <option v-for="user in allUsers" :value="user.id">{{ get_assigned_user(user.user_email) }}</option>
               </select>
               <br />
-              <label class="color-label">Status: {{ edit_card.status }}
+              <label class="color-label" ref="card_edit_status" value="edit_card.status">Status: {{ edit_card.status }}
                 <!-- <select id="status" name="status" v-bind:value="edit_card.status" ref="card_edit_status">
                   <option v-for="status in columns" :value="status">{{ status }}</option>
                 </select> -->
